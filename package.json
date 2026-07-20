@@ -1,0 +1,9 @@
+{
+    "name": "wellred",
+    "version": "1.0.0",
+    "private": true,
+    "description": "WellRed book club site with a live book-recommendation poll",
+    "dependencies": {
+          "@vercel/kv": "^3.0.0"
+    }
+}
