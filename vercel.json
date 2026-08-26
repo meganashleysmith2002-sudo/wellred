@@ -1,15 +1,15 @@
 {
-    "cleanUrls": true,
-    "redirects": [
-          {
-                  "source": "/ballot",
-                  "destination": "https://claude.ai/code/artifact/ab54674b-1a98-441f-b717-d1cd7d081979",
-                  "permanent": false
-          },
-          {
-                  "source": "/count",
-                  "destination": "https://claude.ai/code/artifact/ab54674b-1a98-441f-b717-d1cd7d081979#host",
-                  "permanent": false
-          }
-    ]
+      "cleanUrls": true,
+      "redirects": [
+              {
+                        "source": "/ballot",
+                        "destination": "https://claude.ai/code/artifact/ab54674b-1a98-441f-b717-d1cd7d081979",
+                        "permanent": false
+              },
+              {
+                        "source": "/cellar-vellum-606",
+                        "destination": "https://claude.ai/code/artifact/ab54674b-1a98-441f-b717-d1cd7d081979#host",
+                        "permanent": false
+              }
+      ]
 }
