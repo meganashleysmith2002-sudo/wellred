@@ -42,6 +42,7 @@ a{color:var(--red)}
 :focus-visible{outline:3px solid var(--red);outline-offset:3px}
 
 /* ---------- masthead ---------- */
+.mast,body>footer{max-width:760px;margin-left:auto;margin-right:auto}
 .mast{position:relative;margin-bottom:26px}
 .hero{position:relative;max-height:min(58vh,460px);overflow:hidden}
 .hero img{display:block;width:100%;height:auto}
@@ -181,7 +182,7 @@ h1 i{color:var(--red);font-style:normal}
 .nudge-btn:active{transform:translateY(2px);box-shadow:0 3px 0 rgba(42,23,18,.22)}
 
 /* ---------- photo plate ---------- */
-.plate{position:relative;margin:34px calc(50% - 50vw) 0;width:100vw;
+.plate{position:relative;margin:34px -20px 0;
   border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);
   max-height:min(72vh,560px);overflow:hidden}
 .plate img{width:100%;height:auto;display:block}
@@ -347,7 +348,6 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
   function render(){
     var mine = read(VOTE_KEY), voted = !!mine, h = "";
     h += '<header class="mast">';
-    h += '<div class="brand">Well<b>Red</b></div>';
     h += '<div class="hero"><img src="' + HERO + '" alt=""></div>';
     h += '<div class="wrap"><div class="lockup">';
     h += '<div class="wordmark">Well<b>Red</b></div>';
