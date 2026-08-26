@@ -223,6 +223,16 @@ textarea::placeholder,input::placeholder{color:rgba(107,84,74,.62)}
 .note{margin-top:16px;padding:14px 16px;border-left:4px solid var(--gold);
   background:var(--cream-2);font-size:.88rem;color:var(--ink-soft)}
 
+/* ---------- thanks takeover ---------- */
+.thanks{min-height:92vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:40px 24px 60px}
+.thanks-script{width:min(340px,78vw);height:auto}
+.thanks-cat{
+  width:min(220px,60vw);border:3px solid var(--ink);border-radius:4px 14px 14px 4px;
+  box-shadow:6px 7px 0 rgba(42,23,18,.16);transform:rotate(-2deg);margin-top:26px}
+.thanks-sub{margin-top:26px;color:var(--ink-soft);font-size:.95rem;max-width:34ch}
+.thanks .linky{margin-top:20px}
+
 /* ---------- done ---------- */
 .done{border:3px solid var(--ink);border-radius:4px 18px 18px 4px;background:var(--cream-2);
   color:var(--ink);padding:24px 22px;margin-top:16px;position:relative;
@@ -345,7 +355,21 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       });
   }
 
+  var justSent = false;
+
+  function renderThanks(){
+    app.innerHTML = '<div class="thanks">'
+      + '<img class="thanks-script" src="/thanks-script.png" alt="Thank you! We appreciate the feedback">'
+      + '<img class="thanks-cat" src="/thanks-cat.gif" alt="">'
+      + '<p class="thanks-sub">Your notes are with Meg and Kaitlyn. Winner gets announced at the end of the night.</p>'
+      + '<button class="linky" data-back>Back to the ballot</button>'
+      + "</div>";
+    var b = app.querySelector("[data-back]");
+    if (b) b.addEventListener("click", function(){ justSent = false; render(); window.scrollTo(0,0); });
+  }
+
   function render(){
+    if (justSent) { renderThanks(); return; }
     var mine = read(VOTE_KEY), voted = !!mine, h = "";
     h += '<header class="mast">';
     h += '<div class="hero"><img src="' + HERO + '" alt=""></div>';
@@ -504,7 +528,7 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     }
     if(btn){btn.disabled=true;btn.textContent="Sending\u2026";}
     post({action:"feedback",entry:entry}).then(function(){
-      store(FB_KEY,"1");render();
+      store(FB_KEY,"1");justSent=true;render();window.scrollTo(0,0);
     }).catch(function(){
       if(btn){btn.disabled=false;btn.textContent="Send it";}
       var n=app.querySelector(".note");
