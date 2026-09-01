@@ -365,8 +365,17 @@ footer{margin-top:var(--stack);border-top:1px solid var(--blush-line);padding-bl
   .nav-links{gap:.9em}
   .nav-links a{font-size:.66rem;letter-spacing:.13em}
 }
-@media (max-width:520px){
+@media (max-width:640px){
+  nav.top .wrap{flex-wrap:wrap;row-gap:.1em;padding-block:.7em .6em;justify-content:space-between}
+  .brand{order:1}
+  .mark{order:2;width:38px;height:38px}
+  .nav-links{order:3;width:100%;justify-content:center;gap:clamp(.7em,3.5vw,1.3em);padding-top:.35em}
+  .nav-links a{font-size:.64rem;letter-spacing:.11em}
+}
+@media (max-width:360px){
   .nav-links a:nth-child(5){display:none}
+}
+@media (max-width:520px){
   .mast-eyebrow .line{max-width:38px}
 }
 
