@@ -37,6 +37,7 @@ export default async function handler(req, res) {
   body = body || {};
 
   if (body.action === 'vote') {
+    if (Date.now() >= Date.parse('2026-11-01T00:00:00-04:00')) return res.status(403).json({ error: 'closed' });
     const id = String(body.id || '');
     const prev = body.previous ? String(body.previous) : null;
     if (VALID.indexOf(id) === -1) return res.status(400).json({ error: 'bad vote' });
