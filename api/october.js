@@ -5,7 +5,7 @@ const VALID = ['carmilla', 'fish', 'castle', 'lemoncake'];
 const KEY_VOTES = 'wellred:event:2026-10:votes';
 const KEY_FEED = 'wellred:event:2026-10:feedback';
 const SECRET = 'cellar-vellum-1024';
-const FIELDS = ['name','city','email','age','found','loved','improve','lookfor','spot','books','ticket','price','activity'];
+const FIELDS = ['name','city','email','vote','age','found','loved','improve','lookfor','spot','books','ticket','price','activity'];
 
 export default async function handler(req, res) {
   const url = process.env.KV_REST_API_URL;
