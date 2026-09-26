@@ -102,6 +102,16 @@ h1 i{color:var(--red);font-style:normal}
 .gotit-btn:active{transform:translateY(2px);box-shadow:0 3px 0 rgba(42,23,18,.22)}
 .gotit-note{margin-top:18px;font-size:.85rem;color:var(--ink-soft)}
 
+.gotit-form{margin-top:22px;border:3px solid var(--ink);border-radius:4px 16px 16px 4px;background:var(--cream-2);padding:18px 18px 20px;box-shadow:5px 6px 0 rgba(42,23,18,.16)}
+.gotit-form .gf-k{font-family:'Archivo Black',sans-serif;text-transform:uppercase;letter-spacing:-.01em;font-size:1.05rem;line-height:1.05}
+.gotit-form p{margin-top:6px;font-size:.88rem;color:var(--ink-soft)}
+.gotit-form .gf-row{display:grid;gap:10px;margin-top:14px}
+.gotit-form input{width:100%;font:inherit;font-size:1rem;padding:12px 14px;border:2px solid var(--ink);border-radius:10px;background:var(--cream);color:var(--ink)}
+.gotit-form input:focus{outline:3px solid var(--red);outline-offset:2px}
+.gotit-form .gf-btn{margin-top:12px;background:var(--ink);color:var(--cream);font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;padding:12px 20px;border-radius:999px;border:3px solid var(--ink)}
+.gotit-form .gf-btn[disabled]{opacity:.6}
+.gotit-form .gf-done{margin-top:12px;font-family:'Caveat',cursive;font-size:1.35rem;color:var(--red)}
+
 /* ---------- section head ---------- */
 .sec{margin-top:44px}
 .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
@@ -426,6 +436,16 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       h += '<div class="gotit-pick"><img src="'+b.cover+'" alt=""><div>'
         + '<div class="gp-k">You picked</div><div class="gp-t">'+esc(b.title)+'</div><div class="gp-a">'+esc(b.author)+'</div></div></div>';
     }
+    var ID_KEY = "wellred_oct_id";
+    if (read(ID_KEY)) {
+      h += '<div class="gotit-form"><div class="gf-k">You&rsquo;re on the list</div><p>We&rsquo;ll email you the winner.</p></div>';
+    } else {
+      h += '<div class="gotit-form"><div class="gf-k">Get the winner in your inbox</div>'
+        + '<p>Leave your name and email and we&rsquo;ll send you the October pick when the vote closes, plus first crack at tickets.</p>'
+        + '<div class="gf-row"><input type="text" data-id="name" autocomplete="name" placeholder="Name">'
+        + '<input type="email" data-id="email" autocomplete="email" inputmode="email" placeholder="you@email.com"></div>'
+        + '<button class="gf-btn" data-idsend>Add me</button><div class="gf-msg"></div></div>';
+    }
     h += stdBlock();
     h += '<div class="gotit-acts"><button class="gotit-btn" data-back>Back to the ballot</button>'
       + '<button class="linky" data-goform>Tell us about tonight</button></div>';
@@ -434,6 +454,24 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     app.innerHTML = h;
     var back = app.querySelector("[data-back]");
     if (back) back.addEventListener("click", function(){ justVoted = false; render(); window.scrollTo(0,0); });
+    var idb = app.querySelector("[data-idsend]");
+    if (idb) idb.addEventListener("click", function(){
+      var name = (app.querySelector('[data-id="name"]')||{}).value || "";
+      var email = (app.querySelector('[data-id="email"]')||{}).value || "";
+      var msg = app.querySelector(".gf-msg");
+      name = name.trim(); email = email.trim();
+      if (!email || email.indexOf("@") < 1) { if (msg) msg.textContent = "Add an email first."; return; }
+      var picked = null; BOOKS.forEach(function(x){ if (x.id === mine) picked = x; });
+      idb.disabled = true; idb.textContent = "Adding\u2026";
+      post({action:"feedback", entry:{name:name, email:email, vote: picked ? picked.title : ""}}).then(function(){
+        store(ID_KEY, "1");
+        var box = idb.closest(".gotit-form");
+        if (box) box.innerHTML = '<div class="gf-k">You&rsquo;re on the list</div><div class="gf-done">Thanks' + (name ? ", " + esc(name.split(" ")[0]) : "") + '. We&rsquo;ll email you the winner.</div>';
+      }).catch(function(){
+        idb.disabled = false; idb.textContent = "Add me";
+        if (msg) msg.textContent = "That didn't send. Check your signal and try again.";
+      });
+    });
     var go = app.querySelector("[data-goform]");
     if (go) go.addEventListener("click", function(){
       justVoted = false; render();

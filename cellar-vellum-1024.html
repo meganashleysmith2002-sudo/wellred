@@ -399,13 +399,13 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     h+="</section>";
 
     h+='<section class="sec"><div class="sec-head"><h2>In their words</h2><span class="sec-line"></span></div>';
-    if(!fb.length){h+='<div class="panel"><p class="empty">The good stuff &mdash; what they loved, venue ideas, book recs &mdash; shows up here.</p></div>';}
+    if(!fb.length){h+='<div class="panel"><p class="empty">Names, emails, and what people voted for show up here.</p></div>';}
     else{
       h+='<div class="cards">';
       fb.slice().reverse().forEach(function(f){
         var who=[f.name,f.age,f.city].filter(Boolean).map(esc).join(" &middot; ");
         h+='<div class="voice"><div class="who">'+(who||"anonymous")+"</div>";
-        [["Loved",f.loved],["Would change",f.improve],["Looks for",f.lookfor],
+        [["Voted for",f.vote],["Loved",f.loved],["Would change",f.improve],["Looks for",f.lookfor],
          ["Venue idea",f.spot],["Book recs",f.books],["Activity ideas",f.activity],
          ["Email",f.email]].forEach(function(p){
           if(p[1])h+='<div class="v-item"><span class="v-l">'+p[0]+'</span><span class="v-v">'+esc(p[1])+"</span></div>";
@@ -437,7 +437,7 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       rows.push(["Total","",total(lastData.counts)]);
       return rows;
     }
-    var cols=[["t","Submitted (UTC)"],["name","Name"],["city","City"],["email","Email"],
+    var cols=[["t","Submitted (UTC)"],["name","Name"],["city","City"],["email","Email"],["vote","Voted for"],
       ["age","Age range"],["found","Found us via"],["loved","Loved"],["improve","Would change"],
       ["lookfor","Looks for in a club"],["spot","Venue idea"],["books","Book recs"],
       ["ticket","Ticketed events"],["price","Fair price"],["activity","Activity ideas"]];
