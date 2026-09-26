@@ -86,6 +86,22 @@ h1 i{color:var(--red);font-style:normal}
 .std-where b{display:block;font-weight:800}
 .std-where a{color:var(--blush)}
 
+/* ---------- vote confirmation ---------- */
+.gotit{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:40px 20px 56px;max-width:600px;margin:0 auto}
+.gotit .kick{margin-bottom:6px}
+.gotit h1{font-size:clamp(2.6rem,12vw,4rem)}
+.gotit-pick{display:flex;align-items:center;gap:16px;margin-top:22px;padding:14px 16px;border:3px solid var(--ink);border-radius:4px 14px 14px 4px;background:var(--blush-soft);box-shadow:5px 6px 0 rgba(42,23,18,.16)}
+.gotit-pick img{width:56px;aspect-ratio:2/3;object-fit:cover;border:2px solid var(--ink);border-radius:2px 4px 4px 2px;flex:none}
+.gotit-pick .gp-k{font-size:.7rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--red)}
+.gotit-pick .gp-t{font-family:'Archivo Black',sans-serif;text-transform:uppercase;letter-spacing:-.01em;line-height:1.05;font-size:1.05rem;margin-top:3px}
+.gotit-pick .gp-a{font-family:'Caveat',cursive;font-size:1.05rem;color:var(--ink-soft);margin-top:2px}
+.gotit .std{margin-top:24px}
+.gotit-acts{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:26px}
+.gotit-btn{background:var(--red);color:var(--cream);font-weight:800;font-size:.86rem;letter-spacing:.06em;text-transform:uppercase;
+  padding:14px 22px;border-radius:999px;border:3px solid var(--ink);box-shadow:0 5px 0 rgba(42,23,18,.22)}
+.gotit-btn:active{transform:translateY(2px);box-shadow:0 3px 0 rgba(42,23,18,.22)}
+.gotit-note{margin-top:18px;font-size:.85rem;color:var(--ink-soft)}
+
 /* ---------- section head ---------- */
 .sec{margin-top:44px}
 .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
@@ -388,6 +404,43 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
   window.addEventListener("resize",fitWordmark);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitWordmark);
 
+  function stdBlock(){
+    var h='';
+    h += '<section class="std"><div class="std-k">save the date</div>'
+        + '<div class="std-date">Saturday <i>Oct 24</i></div>'
+        + '<div class="std-time">2 to 4 PM</div>'
+        + '<p>Our October meetup is a crochet class at South Florida Sewing Studio. We&rsquo;ll learn the basics and make our own bookmarks for the October pick.</p>'
+        + '<div class="std-where"><b>South Florida Sewing Studio</b>2629 N Federal Hwy, Fort Lauderdale<br>'
+        + 'Details and RSVP coming on <a href="https://www.instagram.com/thewellredclub/" target="_blank" rel="noopener noreferrer">@thewellredclub</a></div></section>';
+    return h;
+  }
+
+  var justVoted = false;
+  function renderGotIt(){
+    var mine = read(VOTE_KEY), b = null;
+    BOOKS.forEach(function(x){ if (x.id === mine) b = x; });
+    var h = '<div class="gotit">';
+    h += '<div class="kick">the october ballot</div>';
+    h += '<h1>We got <i>your</i> vote</h1>';
+    if (b) {
+      h += '<div class="gotit-pick"><img src="'+b.cover+'" alt=""><div>'
+        + '<div class="gp-k">You picked</div><div class="gp-t">'+esc(b.title)+'</div><div class="gp-a">'+esc(b.author)+'</div></div></div>';
+    }
+    h += stdBlock();
+    h += '<div class="gotit-acts"><button class="gotit-btn" data-back>Back to the ballot</button>'
+      + '<button class="linky" data-goform>Tell us about tonight</button></div>';
+    h += '<p class="gotit-note">Change your mind? Tap another cover on the ballot. Voting is open through October 31.</p>';
+    h += '</div>';
+    app.innerHTML = h;
+    var back = app.querySelector("[data-back]");
+    if (back) back.addEventListener("click", function(){ justVoted = false; render(); window.scrollTo(0,0); });
+    var go = app.querySelector("[data-goform]");
+    if (go) go.addEventListener("click", function(){
+      justVoted = false; render();
+      var sec = app.querySelector("#fbsec"); if (sec) sec.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  }
+
   function renderThanks(){
     app.innerHTML = '<div class="thanks">'
       + '<img class="thanks-script" src="/thanks-script.png" alt="Thank you! We appreciate the feedback">'
@@ -420,6 +473,7 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
   function closed(){ return Date.now() >= CLOSES.getTime(); }
   function render(){
     if (justSent) { renderThanks(); return; }
+    if (justVoted) { renderGotIt(); return; }
     snapshot();
     var mine = read(VOTE_KEY), voted = !!mine, h = "";
     h += '<header class="mast">';
@@ -463,14 +517,7 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     });
     h += "</div>";
 
-    if (voted && !closed()) {
-      h += '<section class="std"><div class="std-k">save the date</div>'
-        + '<div class="std-date">Saturday <i>Oct 24</i></div>'
-        + '<div class="std-time">2 to 4 PM</div>'
-        + '<p>Our October meetup is a crochet class at South Florida Sewing Studio. We&rsquo;ll learn the basics and make our own bookmarks for the October pick.</p>'
-        + '<div class="std-where"><b>South Florida Sewing Studio</b>2629 N Federal Hwy, Fort Lauderdale<br>'
-        + 'Details and RSVP coming on <a href="https://www.instagram.com/thewellredclub/" target="_blank" rel="noopener noreferrer">@thewellredclub</a></div></section>';
-    }
+    if (voted && !closed()) h += stdBlock();
     if (voted && !closed() && !read(FB_KEY)) {
       h += '<div class="nudge"><div class="nudge-k">vote counted</div>'
         + "<p>One more thing while you&rsquo;re here. A few questions about tonight, all optional.</p>"
@@ -567,8 +614,11 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     var prev=read(VOTE_KEY);
     if(prev===id)return;
     store(VOTE_KEY,id);
+    justVoted = true;
     render();
+    window.scrollTo(0,0);
     post({action:"vote",id:id,previous:prev||null}).catch(function(){
+      justVoted = false;
       store(VOTE_KEY,prev||"");
       if(!prev){try{localStorage.removeItem(VOTE_KEY)}catch(e){}}
       render();
