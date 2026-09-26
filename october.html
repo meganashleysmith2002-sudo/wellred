@@ -416,6 +416,8 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       g.querySelectorAll(".chip").forEach(function(c){ c.setAttribute("aria-pressed", c.getAttribute("data-val")===want ? "true":"false"); });
     });
   }
+  var CLOSES = new Date("2026-11-01T00:00:00-04:00");
+  function closed(){ return Date.now() >= CLOSES.getTime(); }
   function render(){
     if (justSent) { renderThanks(); return; }
     snapshot();
@@ -427,10 +429,15 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     h += '<div class="founders">Founded by Kaitlyn <i>&amp;</i> Meg</div></div>';
     h += '<div class="mast-rule"></div>';
     h += '<div class="kick">the october ballot</div>';
-    h += voted ? "<h1>Your <i>pick</i> is in</h1>" : "<h1>Pick the <i>October</i> read</h1>";
-    h += '<p class="sub">' + (voted
-      ? "Tap another cover if you change your mind. We&rsquo;ll announce the winner at the end of the night."
-      : "Four contenders. Flip any one to see what it&rsquo;s about, then vote.") + "</p></div></header>";
+    if (closed()) {
+      h += "<h1>Voting is <i>closed</i></h1>";
+      h += '<p class="sub">The October vote closed on October 31. Follow <a href="https://www.instagram.com/thewellredclub/" target="_blank" rel="noopener noreferrer">@thewellredclub</a> for the winner.</p></div></header>';
+    } else {
+      h += voted ? "<h1>Your <i>pick</i> is in</h1>" : "<h1>Pick the <i>October</i> read</h1>";
+      h += '<p class="sub">' + (voted
+        ? "Tap another cover if you change your mind. Voting stays open through October 31."
+        : "Four contenders. Flip any one to see what it&rsquo;s about, then vote. Voting is open through October 31.") + "</p></div></header>";
+    }
 
     h += '<main class="wrap"><div class="ballot">';
     BOOKS.forEach(function(b){
@@ -440,21 +447,23 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       h += '<div class="cover"><img src="'+b.cover+'" alt="'+esc(b.title)+' cover"></div>';
       h += '<div class="meta"><h3 class="bk-title">'+esc(b.title)+'</h3><div class="bk-author">'+esc(b.author)+'</div>';
       h += '<div class="acts">';
-      h += isMine ? '<span class="vote picked">Your pick &#9733;</span>'
+      h += closed() ? (isMine ? '<span class="vote picked">Your pick &#9733;</span>' : '')
+         : isMine ? '<span class="vote picked">Your pick &#9733;</span>'
                   : '<button class="vote" data-vote="'+b.id+'">Vote</button>';
       h += '<button class="flip" data-flip="'+b.id+'">What&rsquo;s it about</button></div></div></div>';
       h += '<div class="face back"' + (isFlip?"":' aria-hidden="true"') + '>';
       h += '<h3 class="bk-title">'+esc(b.title)+'</h3><p class="syn">'+esc(b.syn)+'</p>';
       h += '<a class="fable" href="'+esc(b.fable)+'" target="_blank" rel="noopener noreferrer">Open on Fable &#8599;</a>';
       h += '<div class="acts">';
-      h += isMine ? '<span class="vote picked">Your pick &#9733;</span>'
+      h += closed() ? (isMine ? '<span class="vote picked">Your pick &#9733;</span>' : '')
+         : isMine ? '<span class="vote picked">Your pick &#9733;</span>'
                   : '<button class="vote" data-vote="'+b.id+'">Vote</button>';
       h += '<button class="flip" data-flip="'+b.id+'">Back to cover</button></div></div>';
       h += "</div></article>";
     });
     h += "</div>";
 
-    if (voted) {
+    if (voted && !closed()) {
       h += '<section class="std"><div class="std-k">save the date</div>'
         + '<div class="std-date">Saturday <i>Oct 24</i></div>'
         + '<div class="std-time">2 to 4 PM</div>'
@@ -462,12 +471,12 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
         + '<div class="std-where"><b>South Florida Sewing Studio</b>2629 N Federal Hwy, Fort Lauderdale<br>'
         + 'Details and RSVP coming on <a href="https://www.instagram.com/thewellredclub/" target="_blank" rel="noopener noreferrer">@thewellredclub</a></div></section>';
     }
-    if (voted && !read(FB_KEY)) {
+    if (voted && !closed() && !read(FB_KEY)) {
       h += '<div class="nudge"><div class="nudge-k">vote counted</div>'
         + "<p>One more thing while you&rsquo;re here. A few questions about tonight, all optional.</p>"
         + '<button class="nudge-btn" data-goform>Tell us about tonight</button></div>';
     }
-    if (voted) h += read(FB_KEY) ? doneBlock() : formBlock();
+    if (voted && !closed()) h += read(FB_KEY) ? doneBlock() : formBlock();
     h += "</main>";
     h += '<footer class="wrap"><span>Well Red Club</span><span>Fort Lauderdale, FL</span></footer>';
     app.innerHTML = h;
