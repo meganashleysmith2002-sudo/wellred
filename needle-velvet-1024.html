@@ -98,7 +98,8 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
     <h2>Early-access email</h2>
     <p class="note" id="bInfo">Loading the list…</p>
     <div class="bar">
-      <button class="btn ghost" id="bTest" type="button">Send us test emails</button>
+      <input id="bTo" type="email" placeholder="Test to (blank = you + Kaitlyn)" style="font:inherit;font-size:15px;padding:.5em .8em;border:1.5px solid var(--blush-line);border-radius:999px;min-width:0;flex:1 1 220px">
+      <button class="btn ghost" id="bTest" type="button">Send test emails</button>
       <button class="btn solid" id="bSend" type="button" disabled>Send to everyone</button>
       <button class="btn ghost" id="bShow" type="button">See who's on it</button>
     </div>
@@ -266,7 +267,7 @@ setInterval(function(){ if (!busy && !document.hidden) load(); }, 20000);
 (function(){
   var info=document.getElementById('bInfo'), st=document.getElementById('bStatus'), list=document.getElementById('bList');
   var sendBtn=document.getElementById('bSend'), armed=false, last=null;
-  function post(action){ return fetch('/api/blast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:KEY,action:action})}).then(function(r){return r.json();}); }
+  function post(action,extra){ var b={key:KEY,action:action}; for(var k in (extra||{})) b[k]=extra[k]; return fetch('/api/blast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json();}); }
   function refresh(){
     if(!KEY) return;
     post('list').then(function(j){
@@ -280,8 +281,9 @@ setInterval(function(){ if (!busy && !document.hidden) load(); }, 20000);
   }
   document.getElementById('bShow').addEventListener('click',function(){ list.hidden=!list.hidden; });
   document.getElementById('bTest').addEventListener('click',function(){
+    var to=document.getElementById('bTo').value.trim();
     st.textContent='Sending test…';
-    post('test').then(function(j){ st.textContent = j.ok ? 'Sent you and Kaitlyn all three emails, marked [TEST]. Check your inboxes.' : 'Test didn\'t send: ' + ((j.results||[]).map(function(r){return r.error||(r.skipped?'email not set up yet':'');}).join(', ') || j.error); });
+    post('test',{to:to}).then(function(j){ st.textContent = j.ok ? 'Sent all three emails, marked [TEST], to ' + (to || 'you and Kaitlyn') + '.' : 'Test didn\'t send: ' + ((j.results||[]).map(function(r){return r.error||(r.skipped?'email not set up yet':'');}).filter(Boolean)[0] || j.error); });
   });
   sendBtn.addEventListener('click',function(){
     if(!armed){ armed=true; sendBtn.textContent='Tap again to send for real'; setTimeout(function(){ armed=false; refresh(); },5000); return; }
