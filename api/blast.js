@@ -3,10 +3,12 @@
 // POST {key, action:'list'}            -> {total, sent, remaining, recipients:[{email,name,sent}]}
 // POST {key, action:'test'}            -> sends all three emails, marked [TEST], to each NOTIFY_TO address
 // POST {key, action:'send'}            -> sends to up to 12 not-yet-sent people; call again until remaining = 0
-import { send, earlyEmail, heldEmail, paidEmail } from './_mail.js';
+import { send, earlyEmail, heldEmail, paidEmail, unsubToken } from './_mail.js';
 
 const SOURCES = ['wellred:event:2026-08-29:feedback', 'wellred:event:2026-10:feedback'];
 const SENT = 'wellred:blast:2026-10-early:sent';
+const UNSUB = 'wellred:unsub';            // set of unsubscribed emails
+const TOKENS = 'wellred:unsub:tokens';    // hash token -> email
 const BATCH = 12;
 
 export default async function handler(req, res) {
@@ -41,11 +43,13 @@ export default async function handler(req, res) {
   }
   const sentR = await call(['SMEMBERS', SENT]);
   const sentSet = new Set(sentR.result || []);
-  const recipients = [...byEmail.values()].map((x) => ({ ...x, sent: sentSet.has(x.email) }));
-  const remaining = recipients.filter((x) => !x.sent);
+  const unR = await call(['SMEMBERS', UNSUB]);
+  const unSet = new Set(unR.result || []);
+  const recipients = [...byEmail.values()].map((x) => ({ ...x, sent: sentSet.has(x.email), unsubscribed: unSet.has(x.email) }));
+  const remaining = recipients.filter((x) => !x.sent && !x.unsubscribed);
 
   if (body.action === 'list') {
-    return res.status(200).json({ total: recipients.length, sent: recipients.length - remaining.length, remaining: remaining.length, recipients });
+    return res.status(200).json({ total: recipients.length, sent: sentSet.size, unsubscribed: recipients.filter((x) => x.unsubscribed).length, remaining: remaining.length, recipients });
   }
 
   if (body.action === 'test') {
@@ -54,7 +58,9 @@ export default async function handler(req, res) {
     const results = [];
     for (const t of to) {
       const sample = { name: 'Test Reader', email: t };
-      for (const [label, msg] of [['early access', earlyEmail(t, '')], ['spot held', heldEmail(sample)], ["you're in", paidEmail(sample)]]) {
+      const tk = unsubToken(t);
+      await call(['HSET', TOKENS, tk, t]);
+      for (const [label, msg] of [['early access', earlyEmail(t, '', tk)], ['spot held', heldEmail(sample)], ["you're in", paidEmail(sample)]]) {
         msg.subject = '[TEST] ' + msg.subject;
         results.push({ to: t, email: label, ...(await send(msg, { test: true })) });
       }
@@ -66,7 +72,9 @@ export default async function handler(req, res) {
     const batch = remaining.slice(0, BATCH);
     const results = [];
     for (const r of batch) {
-      const out = await send(earlyEmail(r.email, r.name));
+      const token = unsubToken(r.email);
+      await call(['HSET', TOKENS, token, r.email]);
+      const out = await send(earlyEmail(r.email, r.name, token));
       if (out.ok) await call(['SADD', SENT, r.email]);
       results.push({ email: r.email, ok: !!out.ok, error: out.error || (out.off ? 'emails are switched off until you approve' : out.skipped ? 'email not set up' : null) });
       if (out.skipped) break;

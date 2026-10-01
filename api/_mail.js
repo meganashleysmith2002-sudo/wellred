@@ -3,6 +3,7 @@
 // and NOTIFY_TO (comma-separated host emails, e.g. Meg and Kaitlyn).
 // Nothing secret lives in this file; the repo is public.
 import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 
 const FROM_ADDR = process.env.SMTP_USER || 'support@wellred.club';
 const DASH = 'https://wellred.club/needle-velvet-1024';
@@ -25,14 +26,14 @@ function withTimeout(p, ms) {
 
 // Real sends stay off until the Vercel env var EMAILS_LIVE is set to "yes".
 // Tests (to Meg and Kaitlyn only) work as soon as SMTP_PASS is set.
-export async function send({ to, subject, text, html, replyTo, attachments }, opts) {
+export async function send({ to, subject, text, html, replyTo, attachments, list, headers }, opts) {
   const t = getTransport();
   if (!t || !to) return { skipped: true };
   if (process.env.EMAILS_LIVE !== 'yes' && !(opts && opts.test)) return { skipped: true, off: true };
   try {
     await withTimeout(t.sendMail({
       from: 'WellRed <' + FROM_ADDR + '>',
-      to, subject, text, html, attachments,
+      to, subject, text, html, attachments, list, headers,
       replyTo: replyTo || FROM_ADDR,
     }), 8000);
     return { ok: true };
@@ -140,9 +141,14 @@ ${DASH}`,
 }
 
 // ---------- October early-access email to past form sign-ups ----------
+// Unsubscribe links carry an opaque token, never the email address itself.
+export function unsubToken(email) {
+  return crypto.createHmac('sha256', 'wellred-unsub:' + (process.env.HOST_KEY || '')).update(String(email).toLowerCase()).digest('hex').slice(0, 24);
+}
+export const unsubUrl = (token) => 'https://wellred.club/api/unsubscribe?t=' + token;
 const RESERVE = 'https://wellred.club/meetups#save';
 
-function earlyHtml(name) {
+function earlyHtml(name, unsub) {
   const p = 'margin:0 0 16px;font-size:16px;line-height:1.5;color:#241412';
   const hi = name ? `Hi ${esc(first(name))},` : 'Hi there,';
   return `<!doctype html><html><body style="margin:0;padding:0;background:#F6EFE3">
@@ -166,15 +172,18 @@ ${VENUE_HTML(p)}
 <table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:4px auto 24px"><tr><td align="center" bgcolor="#8C1C1C" style="background:#8C1C1C;border-radius:999px;mso-padding-alt:14px 28px"><a href="${RESERVE}" target="_blank" style="display:block;padding:14px 28px;font-family:Georgia,serif;font-size:16px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#FFFFFF;text-decoration:none;border-radius:999px">Reserve your spot</a></td></tr></table>
 <p style="${p};text-align:center;font-size:14px">Or go to <a href="${RESERVE}" style="color:#8C1C1C">wellred.club/meetups</a></p>
 <p style="${p}">Hope to see you there,<br>Kaitlyn &amp; Meg</p>
-<p style="margin:0 0 24px;font-size:13px;line-height:1.5;color:#6E514A">You're getting this because you shared your email on a WellRed form. Don't want these? Just reply and we'll take you off the list.</p>
+<p style="margin:0 0 24px;font-size:13px;line-height:1.5;color:#6E514A">You're getting this because you shared your email on a WellRed form. <a href="${unsub}" style="color:#6E514A;text-decoration:underline">Unsubscribe</a></p>
 </td></tr></table></td></tr></table></body></html>`;
 }
 
-export function earlyEmail(to, name) {
+export function earlyEmail(to, name, token) {
+  const unsub = unsubUrl(token || unsubToken(to));
   return {
     to,
+    list: { unsubscribe: { url: unsub, comment: 'Unsubscribe' } },
+    headers: { 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
     subject: 'Happy October! You get first access to our next meetup',
-    html: earlyHtml(name),
+    html: earlyHtml(name, unsub),
     attachments: PUMPKIN,
     text:
 `${name ? 'Hi ' + first(name) + ',' : 'Hi there,'}
@@ -196,6 +205,6 @@ How to save your spot:
 Hope to see you there,
 Kaitlyn & Meg
 
-You're getting this because you shared your email on a WellRed form. Don't want these? Just reply and we'll take you off the list.`,
+You're getting this because you shared your email on a WellRed form. Unsubscribe: ${unsub}`,
   };
 }
