@@ -53,7 +53,9 @@ export default async function handler(req, res) {
   }
 
   if (body.action === 'test') {
-    const to = (process.env.NOTIFY_TO || '').split(',').map((x) => x.trim()).filter(Boolean);
+    const extra = String(body.to || '').trim().toLowerCase();
+    const to = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(extra) ? [extra]
+      : (process.env.NOTIFY_TO || '').split(',').map((x) => x.trim()).filter(Boolean);
     if (!to.length) return res.status(400).json({ error: 'NOTIFY_TO not set' });
     const results = [];
     for (const t of to) {
