@@ -50,6 +50,10 @@ export default async function handler(req, res) {
     const spots = await load();
     const taken = spots.filter((s) => isActive(s, now)).length;
     const left = Math.max(0, CAP - taken);
+    if (req.query.check) {
+      const mine = spots.find((x) => x.id === String(req.query.check));
+      return res.status(200).json({ active: !!(mine && isActive(mine, now)), paid: !!(mine && mine.paid), left, cap: CAP });
+    }
     if (SECRET && (req.query.key || '') === SECRET) {
       return res.status(200).json({ spots, cap: CAP, left, holdHours: 48 });
     }

@@ -72,8 +72,8 @@ ${VENUE_HTML(p)}
 
 // Gifs ride inside the email (inline attachments) so they show even when a
 // mail app blocks images that load from a website.
-const CAT = [{ filename: 'wellred.gif', path: 'https://wellred.club/thanks-cat.gif', cid: 'wellred-cat', contentType: 'image/gif' }];
-const PUMPKIN = [{ filename: 'happy-october.gif', path: 'https://wellred.club/october-pumpkin.gif', cid: 'wellred-pumpkin', contentType: 'image/gif' }];
+const CAT = [{ filename: 'wellred.gif', path: 'https://wellred.club/thanks-cat-email.gif', cid: 'wellred-cat', contentType: 'image/gif' }];
+const PUMPKIN = [{ filename: 'happy-october.gif', path: 'https://wellred.club/october-pumpkin-email.gif', cid: 'wellred-pumpkin', contentType: 'image/gif' }];
 
 export function heldEmail(s) {
   return {
