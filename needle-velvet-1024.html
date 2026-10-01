@@ -37,8 +37,10 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 .filters button.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .list{display:flex;flex-direction:column;gap:12px}
 .row{background:var(--paper-2);border:1px solid var(--blush-line);border-radius:16px;padding:14px 16px}
-.row.paid{border-color:var(--ok);box-shadow:inset 4px 0 0 var(--ok)}
-.row.held{box-shadow:inset 4px 0 0 var(--warn)}
+.row.paid{border-color:var(--ok);box-shadow:inset 4px 0 0 var(--ok);background:#F3F8F2}
+.row.paid .name{color:var(--ok)}
+.row.held .name{color:var(--claret)}
+.row.held{border-color:var(--claret);box-shadow:inset 4px 0 0 var(--claret);background:#FBF1EF}
 .row.gone{opacity:.6}
 .top{display:flex;gap:12px;align-items:flex-start}
 .check{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;user-select:none}
@@ -50,7 +52,7 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 .contact a{color:inherit}
 .status{display:inline-block;margin:6px 0 4px;font-family:Lora,serif;font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;padding:.35em .8em;white-space:nowrap}
 .s-paid{background:var(--ok-soft);color:var(--ok)}
-.s-held{background:var(--warn-soft);color:var(--warn)}
+.s-held{background:#F6DAD6;color:var(--claret)}
 .s-exp,.s-rel{background:#EEE6E3;color:var(--ink-soft)}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--blush-line)}
 .actions .btn{font-size:.66rem;padding:.55em 1em;min-height:36px}
@@ -73,7 +75,7 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 
   <div class="tiles">
     <div class="tile"><b id="tPaid">0</b><span>Paid</span></div>
-    <div class="tile"><b id="tHeld">0</b><span>Waiting on Zelle</span></div>
+    <div class="tile"><b id="tHeld">0</b><span>Unpaid</span></div>
     <div class="tile"><b id="tLeft">25</b><span>Spots left</span></div>
     <div class="tile"><b id="tMoney">$0</b><span>Collected</span></div>
   </div>
@@ -87,7 +89,7 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 
   <div class="filters" id="filters">
     <button data-f="all" class="on">Everyone</button>
-    <button data-f="held">Waiting on Zelle</button>
+    <button data-f="held">Unpaid</button>
     <button data-f="paid">Paid</button>
     <button data-f="gone">Expired / released</button>
   </div>
@@ -151,7 +153,7 @@ function render(){
   list.innerHTML = shown.map(function(s){
     var st = state(s);
     var badge = st === 'paid' ? '<span class="status s-paid">Paid</span>'
-      : st === 'held' ? '<span class="status s-held">' + hoursLeft(s) + 'h left to pay</span>'
+      : st === 'held' ? '<span class="status s-held">Unpaid · ' + hoursLeft(s) + 'h left</span>'
       : st === 'expired' ? '<span class="status s-exp">Hold expired</span>'
       : '<span class="status s-rel">Released</span>';
     var acts = '';
