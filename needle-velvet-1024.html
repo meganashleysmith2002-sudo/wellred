@@ -69,6 +69,7 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 .blist{list-style:none;margin-top:10px;max-height:260px;overflow:auto;font-size:.95rem;color:var(--ink-soft)}
 .blist li{padding:4px 0;border-bottom:1px dashed var(--blush-line)}
 .blist li.sent{color:var(--ok)}
+.blist li.unsub{color:var(--ink-soft);text-decoration:line-through}
 </style>
 </head>
 <body>
@@ -271,10 +272,10 @@ setInterval(function(){ if (!busy && !document.hidden) load(); }, 20000);
     post('list').then(function(j){
       if(!j || j.error){ info.textContent = j && j.error==='nope' ? 'Enter the passcode above first.' : 'Couldn\'t load the list.'; return; }
       last=j;
-      info.textContent = j.total + ' people on the list · ' + j.sent + ' sent · ' + j.remaining + ' not sent yet. Everyone who left an email on the August/September and October forms, duplicates removed.';
+      info.textContent = j.total + ' people on the list · ' + j.sent + ' sent · ' + j.remaining + ' not sent yet' + (j.unsubscribed ? ' · ' + j.unsubscribed + ' unsubscribed' : '') + '. Everyone who left an email on the August/September and October forms, duplicates removed. Anyone who unsubscribes is skipped automatically.';
       sendBtn.disabled = j.remaining===0;
       sendBtn.textContent = j.remaining ? 'Send to ' + j.remaining + ' people' : 'All sent';
-      list.innerHTML = j.recipients.map(function(r){ return '<li class="'+(r.sent?'sent':'')+'">'+esc(r.name||'(no name)')+' · '+esc(r.email)+(r.sent?' · sent':'')+'</li>'; }).join('');
+      list.innerHTML = j.recipients.map(function(r){ return '<li class="'+(r.unsubscribed?'unsub':r.sent?'sent':'')+'">'+esc(r.name||'(no name)')+' · '+esc(r.email)+(r.unsubscribed?' · unsubscribed':r.sent?' · sent':'')+'</li>'; }).join('');
     });
   }
   document.getElementById('bShow').addEventListener('click',function(){ list.hidden=!list.hidden; });
