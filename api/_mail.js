@@ -25,14 +25,14 @@ function withTimeout(p, ms) {
 
 // Real sends stay off until the Vercel env var EMAILS_LIVE is set to "yes".
 // Tests (to Meg and Kaitlyn only) work as soon as SMTP_PASS is set.
-export async function send({ to, subject, text, html, replyTo }, opts) {
+export async function send({ to, subject, text, html, replyTo, attachments }, opts) {
   const t = getTransport();
   if (!t || !to) return { skipped: true };
   if (process.env.EMAILS_LIVE !== 'yes' && !(opts && opts.test)) return { skipped: true, off: true };
   try {
     await withTimeout(t.sendMail({
       from: 'WellRed <' + FROM_ADDR + '>',
-      to, subject, text, html,
+      to, subject, text, html, attachments,
       replyTo: replyTo || FROM_ADDR,
     }), 8000);
     return { ok: true };
@@ -59,7 +59,7 @@ function heldHtml(s) {
 <p style="margin:0 0 18px;font-size:22px;font-weight:bold;color:#241412">Well<span style="color:#8C1C1C">Red</span></p>
 <p style="${p}">Hi ${esc(first(s.name))},</p>
 <p style="${p}">Your spot for the WellRed crochet class is held for 48 hours.</p>
-<p style="text-align:center;margin:0 0 18px"><img src="https://wellred.club/thanks-cat.gif" width="200" height="356" alt="A very happy cat" style="display:inline-block;border-radius:12px;max-width:100%;height:auto"></p>
+<p style="text-align:center;margin:0 0 18px"><img src="cid:wellred-cat" width="200" height="356" alt="A very happy cat" style="display:inline-block;border-radius:12px;max-width:100%;height:auto"></p>
 <p style="${p};background:#F3DCD7;border-radius:12px;padding:14px 16px"><b>To lock it in, Zelle $50 to Megan Smith at 954-806-3579</b> and put your full name in the memo.</p>
 ${VENUE_HTML(p)}
 <p style="${p}">Once your Zelle comes through, we'll email you a confirmation. If we don't get it within 48 hours, the spot goes to the next person.</p>
@@ -69,9 +69,15 @@ ${VENUE_HTML(p)}
 </td></tr></table></td></tr></table></body></html>`;
 }
 
+// Gifs ride inside the email (inline attachments) so they show even when a
+// mail app blocks images that load from a website.
+const CAT = [{ filename: 'wellred.gif', path: 'https://wellred.club/thanks-cat.gif', cid: 'wellred-cat', contentType: 'image/gif' }];
+const PUMPKIN = [{ filename: 'happy-october.gif', path: 'https://wellred.club/october-pumpkin.gif', cid: 'wellred-pumpkin', contentType: 'image/gif' }];
+
 export function heldEmail(s) {
   return {
     html: heldHtml(s),
+    attachments: CAT,
     to: s.email,
     subject: 'Your spot is held: WellRed crochet class, Oct 24',
     text:
@@ -146,7 +152,7 @@ function earlyHtml(name) {
 <p style="margin:0 0 18px;font-size:22px;font-weight:bold;color:#241412">Well<span style="color:#8C1C1C">Red</span></p>
 <p style="${p}">${hi}</p>
 <p style="${p}"><b>Happy October!!</b> Since you gave us your email on one of our forms, you get exclusive first access to our October meetup before we post it anywhere else.</p>
-<p style="text-align:center;margin:0 0 18px"><img src="https://wellred.club/october-pumpkin.gif" width="300" height="249" alt="Happy October" style="display:inline-block;border-radius:12px;max-width:100%;height:auto"></p>
+<p style="text-align:center;margin:0 0 18px"><img src="cid:wellred-pumpkin" width="300" height="249" alt="Happy October" style="display:inline-block;border-radius:12px;max-width:100%;height:auto"></p>
 <p style="${p}">We're doing a crochet class at South Florida Sewing Studio. An instructor will teach everyone to crochet their own bookmark, then we'll talk about Carmilla (the edition edited by Carmen Maria Machado).</p>
 ${VENUE_HTML(p)}
 <p style="${p}">Tickets are $50 and there are only 23 spots. That covers a full 1 to 1.5 hour class with an instructor, your yarn and crochet hook, and printed instructions to take home if you don't finish in class.</p>
@@ -157,7 +163,8 @@ ${VENUE_HTML(p)}
 <li style="margin-bottom:6px">Zelle $50 to Megan Smith at 954-806-3579 with your full name in the memo.</li>
 <li>Once it comes through, we'll email you that you're officially in.</li>
 </ol>
-<p style="text-align:center;margin:0 0 22px"><a href="${RESERVE}" style="display:inline-block;background:#8C1C1C;color:#FCF4EC;text-decoration:none;font-family:Georgia,serif;font-size:15px;letter-spacing:1px;text-transform:uppercase;padding:14px 26px;border-radius:999px">Reserve your spot</a></p>
+<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:4px auto 24px"><tr><td align="center" bgcolor="#8C1C1C" style="background:#8C1C1C;border-radius:999px;mso-padding-alt:14px 28px"><a href="${RESERVE}" target="_blank" style="display:block;padding:14px 28px;font-family:Georgia,serif;font-size:16px;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#FFFFFF;text-decoration:none;border-radius:999px">Reserve your spot</a></td></tr></table>
+<p style="${p};text-align:center;font-size:14px">Or go to <a href="${RESERVE}" style="color:#8C1C1C">wellred.club/meetups</a></p>
 <p style="${p}">Hope to see you there,<br>Kaitlyn &amp; Meg</p>
 <p style="margin:0 0 24px;font-size:13px;line-height:1.5;color:#6E514A">You're getting this because you shared your email on a WellRed form. Don't want these? Just reply and we'll take you off the list.</p>
 </td></tr></table></td></tr></table></body></html>`;
@@ -168,6 +175,7 @@ export function earlyEmail(to, name) {
     to,
     subject: 'Happy October! You get first access to our next meetup',
     html: earlyHtml(name),
+    attachments: PUMPKIN,
     text:
 `${name ? 'Hi ' + first(name) + ',' : 'Hi there,'}
 
