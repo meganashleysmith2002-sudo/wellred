@@ -1,7 +1,7 @@
 // October early-access email to everyone who left an email on the Aug/Sept and October forms.
 // All actions need the host passcode (HOST_KEY env var).
 // POST {key, action:'list'}            -> {total, sent, remaining, recipients:[{email,name,sent}]}
-// POST {key, action:'test'}            -> sends all three emails, marked [TEST], to each NOTIFY_TO address
+// POST {key, action:'test', to?, all?} -> sends the early-access email (or all three with all:true), marked [TEST]
 // POST {key, action:'send'}            -> sends to up to 12 not-yet-sent people; call again until remaining = 0
 import { send, earlyEmail, heldEmail, paidEmail, unsubToken } from './_mail.js';
 
@@ -62,7 +62,8 @@ export default async function handler(req, res) {
       const sample = { name: 'Test Reader', email: t };
       const tk = unsubToken(t);
       await call(['HSET', TOKENS, tk, t]);
-      for (const [label, msg] of [['early access', earlyEmail(t, '', tk)], ['spot held', heldEmail(sample)], ["you're in", paidEmail(sample)]]) {
+      const all = [['early access', earlyEmail(t, '', tk)], ['spot held', heldEmail(sample)], ["you're in", paidEmail(sample)]];
+      for (const [label, msg] of (body.all ? all : all.slice(0, 1))) {
         msg.subject = '[TEST] ' + msg.subject;
         results.push({ to: t, email: label, ...(await send(msg, { test: true })) });
       }

@@ -4,6 +4,7 @@
 // Nothing secret lives in this file; the repo is public.
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
+import fs from 'fs';
 
 const FROM_ADDR = process.env.SMTP_USER || 'support@wellred.club';
 const DASH = 'https://wellred.club/needle-velvet-1024';
@@ -72,8 +73,14 @@ ${VENUE_HTML(p)}
 
 // Gifs ride inside the email (inline attachments) so they show even when a
 // mail app blocks images that load from a website.
-const CAT = [{ filename: 'wellred.gif', path: 'https://wellred.club/thanks-cat-email.gif', cid: 'wellred-cat', contentType: 'image/gif' }];
-const PUMPKIN = [{ filename: 'happy-october.gif', path: 'https://wellred.club/october-pumpkin-email.gif', cid: 'wellred-pumpkin', contentType: 'image/gif' }];
+
+// The gif files ship with this code (api/_assets), so nothing is downloaded at send time.
+function asset(fileUrl, fallbackUrl) {
+  try { return { content: fs.readFileSync(fileUrl) }; }
+  catch (e) { return { path: fallbackUrl }; }
+}
+const CAT = [{ filename: 'wellred.gif', ...asset(new URL('./_assets/thanks-cat-email.gif', import.meta.url), 'https://www.wellred.club/thanks-cat-email.gif'), cid: 'wellred-cat', contentType: 'image/gif', contentDisposition: 'inline' }];
+const PUMPKIN = [{ filename: 'happy-october.gif', ...asset(new URL('./_assets/october-pumpkin-email.gif', import.meta.url), 'https://www.wellred.club/october-pumpkin-email.gif'), cid: 'wellred-pumpkin', contentType: 'image/gif', contentDisposition: 'inline' }];
 
 export function heldEmail(s) {
   return {
