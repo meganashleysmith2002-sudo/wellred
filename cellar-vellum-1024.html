@@ -328,7 +328,9 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
   var AGES = ["Under 21", "21\u201324", "25\u201329", "30\u201334", "35\u201344", "45+"];
   var TICKET = ["Yes, sign me up", "Maybe, depends on price", "Free events only"];
   var PRICE = ["Under $15", "$15\u201325", "$25\u201340", "$40+"];
-  var SECRET = "cellar-vellum-1024";
+  var SECRET = ""; try { SECRET = localStorage.getItem("wr-host-key") || ""; } catch(e){}
+  function askKey(){ var k = window.prompt("Host passcode"); if (!k) return false; SECRET = k.trim(); try { localStorage.setItem("wr-host-key", SECRET); } catch(e){} return true; }
+  if (!SECRET) askKey();
   var app = document.getElementById("app");
   var lastData = {counts:{}, feedback:[]};
 
@@ -476,8 +478,9 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
   }
 
   function refresh(){
-    fetch("/api/october?key="+SECRET).then(function(r){return r.json()})
-      .then(render).catch(function(){});
+    if(!SECRET)return;
+    fetch("/api/october?key="+encodeURIComponent(SECRET)).then(function(r){return r.json()})
+      .then(function(j){ if(j&&j.error==="nope"){ SECRET=""; try{localStorage.removeItem("wr-host-key");}catch(e){} if(askKey()) refresh(); return; } render(j); }).catch(function(){});
   }
   refresh();
   setInterval(refresh,5000);

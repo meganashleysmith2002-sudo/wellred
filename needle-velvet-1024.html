@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>October Spots</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6EFE3;--paper-2:#FDFAF4;--ink:#241412;--ink-soft:#6E514A;
+  --claret:#8C1C1C;--claret-deep:#4E1210;--blush:#E3B4AE;--blush-soft:#F3DCD7;--blush-line:#D39D96;
+  --ok:#2F6B3A;--ok-soft:#E3EFE2;--warn:#9A5B12;--warn-soft:#F6E7CF;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:"EB Garamond",Georgia,serif;font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased;padding:0 0 60px}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 18px;border-bottom:1px solid var(--blush-line);margin-bottom:20px}
+.brand{font-family:Lora,serif;font-weight:700;font-size:1.25rem}
+.brand b{color:var(--claret)}
+h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);line-height:1.1;margin-top:10px}
+.meta{color:var(--ink-soft);margin-top:4px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 8px}
+.tile{background:var(--paper-2);border:1px solid var(--blush-line);border-radius:14px;padding:12px 10px;text-align:center}
+.tile b{display:block;font-family:Lora,serif;font-size:1.9rem;line-height:1;color:var(--claret)}
+.tile span{display:block;font-family:Lora,serif;font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-top:6px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 6px}
+.btn{font-family:Lora,serif;font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:1.5px solid var(--claret);background:var(--blush-soft);color:var(--ink);border-radius:999px;padding:.7em 1.2em;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.4em;min-height:40px}
+.btn.solid{background:var(--claret);color:#FCF4EC}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.5;cursor:default}
+.note{color:var(--ink-soft);font-size:.95rem}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
+.filters button{font:inherit;font-size:.92rem;background:transparent;border:1px solid var(--blush-line);border-radius:999px;padding:.3em .9em;cursor:pointer;color:var(--ink-soft)}
+.filters button.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.list{display:flex;flex-direction:column;gap:12px}
+.row{background:var(--paper-2);border:1px solid var(--blush-line);border-radius:16px;padding:14px 16px}
+.row.paid{border-color:var(--ok);box-shadow:inset 4px 0 0 var(--ok)}
+.row.held{box-shadow:inset 4px 0 0 var(--warn)}
+.row.gone{opacity:.6}
+.top{display:flex;gap:12px;align-items:flex-start}
+.check{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;user-select:none}
+.check input{width:26px;height:26px;accent-color:var(--ok);cursor:pointer}
+.check small{font-family:Lora,serif;font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.who{flex:1;min-width:0}
+.name{font-family:Lora,serif;font-weight:600;font-size:1.15rem;line-height:1.2}
+.contact{color:var(--ink-soft);font-size:.95rem;word-break:break-word}
+.contact a{color:inherit}
+.status{display:inline-block;margin:6px 0 4px;font-family:Lora,serif;font-size:.66rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;padding:.35em .8em;white-space:nowrap}
+.s-paid{background:var(--ok-soft);color:var(--ok)}
+.s-held{background:var(--warn-soft);color:var(--warn)}
+.s-exp,.s-rel{background:#EEE6E3;color:var(--ink-soft)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--blush-line)}
+.actions .btn{font-size:.66rem;padding:.55em 1em;min-height:36px}
+.confirmed{font-size:.9rem;color:var(--ok);align-self:center}
+.empty{text-align:center;color:var(--ink-soft);padding:40px 0}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:.7em 1.2em;border-radius:999px;font-size:.95rem;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Well<b>Red</b> · hosts only</div>
+    <h1>October 24 crochet class</h1>
+    <p class="meta">South Florida Sewing Studio · 25 spots · $50 by Zelle · holds last 48 hours</p>
+  </header>
+
+  <div class="tiles">
+    <div class="tile"><b id="tPaid">0</b><span>Paid</span></div>
+    <div class="tile"><b id="tHeld">0</b><span>Waiting on Zelle</span></div>
+    <div class="tile"><b id="tLeft">25</b><span>Spots left</span></div>
+    <div class="tile"><b id="tMoney">$0</b><span>Collected</span></div>
+  </div>
+
+  <div class="bar">
+    <button class="btn ghost" id="refresh" type="button">Refresh</button>
+    <button class="btn ghost" id="csv" type="button">Download list</button>
+    <span class="note" id="updated"></span>
+  </div>
+  <p class="note">When a Zelle comes in, check Paid. A text to that person opens on your phone, already written. Just hit send.</p>
+
+  <div class="filters" id="filters">
+    <button data-f="all" class="on">Everyone</button>
+    <button data-f="held">Waiting on Zelle</button>
+    <button data-f="paid">Paid</button>
+    <button data-f="gone">Expired / released</button>
+  </div>
+
+  <div class="list" id="list"><p class="empty">Loading…</p></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var KEY = ''; try { KEY = localStorage.getItem('wr-host-key') || ''; } catch(e){}
+var API = '/api/spots';
+var HOLD = 48 * 3600 * 1000;
+var data = { spots: [], cap: 25, left: 25 };
+var filter = 'all';
+var busy = false;
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function first(n){ return String(n || '').trim().split(/\s+/)[0] || 'there'; }
+function digits(p){ var d = String(p || '').replace(/\D/g, ''); if (d.length === 10) d = '1' + d; return d; }
+function state(s){
+  if (s.removed) return 'removed';
+  if (s.paid) return 'paid';
+  if (s.released) return 'released';
+  return (Date.now() - Date.parse(s.t) < HOLD) ? 'held' : 'expired';
+}
+function hoursLeft(s){ return Math.max(0, Math.ceil((Date.parse(s.t) + HOLD - Date.now()) / 3600000)); }
+function when(t){ try { return new Date(t).toLocaleString([], {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}); } catch(e){ return t; } }
+function toast(m){ var t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(function(){ t.classList.remove('on'); }, 2400); }
+
+function confirmText(s){
+  return 'Hi ' + first(s.name) + ', it\'s Meg from WellRed! Got your Zelle, you\'re officially in for the crochet class on Saturday, Oct 24, 2 to 4 PM at South Florida Sewing Studio, 2629 N Federal Hwy, Fort Lauderdale. Yarn, hook and instructions are covered, just bring Carmilla (the Carmen Maria Machado edition). See you there!';
+}
+function smsLink(s){
+  var body = encodeURIComponent(confirmText(s));
+  var d = digits(s.phone);
+  var ios = /iPhone|iPad|Macintosh/.test(navigator.userAgent);
+  return 'sms:+' + d + (ios ? '&' : '?') + 'body=' + body;
+}
+function mailLink(s){
+  return 'mailto:' + encodeURIComponent(s.email) + '?subject=' + encodeURIComponent("You're in: WellRed crochet class, Oct 24") + '&body=' + encodeURIComponent(confirmText(s));
+}
+
+function render(){
+  var spots = data.spots.filter(function(s){ return !s.removed; });
+  var paid = spots.filter(function(s){ return state(s) === 'paid'; });
+  var held = spots.filter(function(s){ return state(s) === 'held'; });
+  document.getElementById('tPaid').textContent = paid.length;
+  document.getElementById('tHeld').textContent = held.length;
+  document.getElementById('tLeft').textContent = Math.max(0, data.cap - paid.length - held.length);
+  document.getElementById('tMoney').textContent = '$' + (paid.length * 50);
+
+  var shown = spots.filter(function(s){
+    var st = state(s);
+    if (filter === 'all') return true;
+    if (filter === 'gone') return st === 'expired' || st === 'released';
+    return st === filter;
+  });
+  var list = document.getElementById('list');
+  if (!shown.length){ list.innerHTML = '<p class="empty">' + (spots.length ? 'Nobody here.' : 'No sign-ups yet.') + '</p>'; return; }
+
+  list.innerHTML = shown.map(function(s){
+    var st = state(s);
+    var badge = st === 'paid' ? '<span class="status s-paid">Paid</span>'
+      : st === 'held' ? '<span class="status s-held">' + hoursLeft(s) + 'h left to pay</span>'
+      : st === 'expired' ? '<span class="status s-exp">Hold expired</span>'
+      : '<span class="status s-rel">Released</span>';
+    var acts = '';
+    if (st === 'paid'){
+      acts += '<a class="btn solid" href="' + smsLink(s) + '" data-confirm="' + s.id + '">Text confirmation</a>';
+      acts += '<a class="btn" href="' + mailLink(s) + '" data-confirm="' + s.id + '">Email confirmation</a>';
+      if (s.confirmedAt) acts += '<span class="confirmed">Confirmation opened ' + esc(when(s.confirmedAt)) + '</span>';
+    } else if (st === 'held'){
+      acts += '<button class="btn ghost" data-act="release" data-id="' + s.id + '">Release spot</button>';
+    } else {
+      acts += '<button class="btn ghost" data-act="restore" data-id="' + s.id + '">Give 48 more hours</button>';
+      acts += '<button class="btn ghost" data-act="remove" data-id="' + s.id + '">Remove</button>';
+    }
+    return '<div class="row ' + (st === 'paid' ? 'paid' : st === 'held' ? 'held' : 'gone') + '">' +
+      '<div class="top">' +
+        '<label class="check"><input type="checkbox" data-paid="' + s.id + '"' + (s.paid ? ' checked' : '') + '><small>Paid</small></label>' +
+        '<div class="who"><div class="name">' + esc(s.name) + '</div>' + badge +
+          '<div class="contact"><a href="tel:+' + digits(s.phone) + '">' + esc(s.phone) + '</a> · <a href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a></div>' +
+          '<div class="contact">Signed up ' + esc(when(s.t)) + (s.paidAt ? ' · paid ' + esc(when(s.paidAt)) : '') + '</div></div>' +
+      '</div>' +
+      '<div class="actions">' + acts + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function askKey(msg){
+  var k = window.prompt(msg || 'Host passcode');
+  if (!k) return false;
+  KEY = k.trim(); try { localStorage.setItem('wr-host-key', KEY); } catch(e){}
+  return true;
+}
+function load(){
+  if (!KEY && !askKey()) { document.getElementById('list').innerHTML = '<p class="empty">Enter the host passcode to see the list. <button class="btn ghost" onclick="askKey()&&load()">Enter passcode</button></p>'; return Promise.resolve(); }
+  return fetch(API + '?key=' + encodeURIComponent(KEY) + '&_=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.json(); }).then(function(j){
+    if (j && j.error === 'nope'){ KEY = ''; try { localStorage.removeItem('wr-host-key'); } catch(e){} document.getElementById('list').innerHTML = '<p class="empty">That passcode didn\'t work. <button class="btn ghost" onclick="askKey()&&load()">Try again</button></p>'; return; }
+    if (j && j.spots){ data = j; render(); document.getElementById('updated').textContent = 'Updated ' + new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+  }).catch(function(){ toast("Couldn't load the list. Check your connection."); });
+}
+function act(action, id, extra){
+  var body = { action: action, id: id, key: KEY };
+  for (var k in (extra || {})) body[k] = extra[k];
+  return fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(function(r){ return r.json(); }).then(function(j){
+    if (j && j.spot){ data.spots = data.spots.map(function(s){ return s.id === id ? j.spot : s; }); render(); }
+    return j;
+  });
+}
+
+document.getElementById('list').addEventListener('change', function(e){
+  var id = e.target.getAttribute('data-paid');
+  if (!id) return;
+  var paid = e.target.checked;
+  busy = true;
+  act('paid', id, { paid: paid }).then(function(){
+    busy = false;
+    if (paid){
+      var s = data.spots.find(function(x){ return x.id === id; });
+      toast('Marked paid. Opening a text to ' + first(s && s.name) + '…');
+      if (s){ act('confirmed', id); setTimeout(function(){ window.location.href = smsLink(s); }, 500); }
+    } else {
+      toast('Unmarked.');
+    }
+  }).catch(function(){ busy = false; toast("That didn't save. Try again."); e.target.checked = !paid; });
+});
+document.getElementById('list').addEventListener('click', function(e){
+  var c = e.target.closest('[data-confirm]');
+  if (c){ act('confirmed', c.getAttribute('data-confirm')); return; }
+  var b = e.target.closest('[data-act]');
+  if (!b) return;
+  b.disabled = true;
+  act(b.getAttribute('data-act'), b.getAttribute('data-id')).then(function(){ toast('Saved.'); });
+});
+document.getElementById('filters').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if (!b) return;
+  filter = b.getAttribute('data-f');
+  [].forEach.call(this.children, function(x){ x.classList.toggle('on', x === b); });
+  render();
+});
+document.getElementById('refresh').addEventListener('click', load);
+document.getElementById('csv').addEventListener('click', function(){
+  var rows = [['Name','Email','Phone','Signed up','Status','Paid at']];
+  data.spots.filter(function(s){ return !s.removed; }).forEach(function(s){ rows.push([s.name, s.email, s.phone, s.t, state(s), s.paidAt || '']); });
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'wellred-oct24-spots.csv'; a.click();
+});
+load();
+setInterval(function(){ if (!busy && !document.hidden) load(); }, 20000);
+</script>
+</body>
+</html>

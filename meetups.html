@@ -389,6 +389,24 @@ footer{margin-top:var(--stack);border-top:1px solid var(--blush-line);padding-bl
 .venue-name a{display:flex;flex-direction:column;align-items:center;text-align:center;color:var(--ink);text-decoration:none}
 .venue-name span,.venue-name em{font-family:var(--display);font-size:.78rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;font-style:normal;color:var(--ink-soft)}
 .venue-name b{font-family:var(--display);font-weight:600;font-size:clamp(2rem,5vw,3rem);line-height:1.05;color:var(--claret);margin:.25em 0 .35em}
+.save{margin-top:var(--stack)}
+.save-card{max-width:620px;margin:0 auto;background:var(--paper-2);border:8px solid var(--blush);border-radius:22px;padding:clamp(24px,5vw,44px);box-shadow:0 18px 40px -28px rgba(78,18,16,.55)}
+.save-card h2{font-family:var(--display);font-weight:600;font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.05;margin:.3em 0 .4em}
+.save-card h2 i{font-style:normal;font-weight:500;color:var(--claret)}
+.save-card p{color:var(--ink-soft);margin-top:.8em}
+.save-card .save-sub{margin-top:0}
+.save-card form{display:flex;flex-direction:column;gap:14px;margin-top:1.4em}
+.save-card label{display:flex;flex-direction:column;gap:6px;font-family:var(--display);font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.save-card input{font:inherit;font-family:var(--text);font-size:17px;letter-spacing:0;text-transform:none;color:var(--ink);background:#fff;border:1.5px solid var(--blush-line);border-radius:12px;padding:.75em .9em;width:100%}
+.save-card input:focus{outline:none;border-color:var(--claret)}
+.save-card .btn{align-self:flex-start;margin-top:4px}
+.save-err{color:var(--claret)!important;min-height:0;margin:0!important;font-weight:600}
+.save-err:empty{display:none}
+.save-left{font-family:var(--display);font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin:0!important}
+.save-step{color:var(--ink)!important;font-size:1.12rem;background:var(--blush-soft);border-radius:14px;padding:.9em 1.1em}
+.save-policy{font-size:.95rem;border-top:1px solid var(--blush-line);padding-top:1em}
+.save-card a{color:var(--claret)}
+@media (max-width:640px){.save-card{border-width:5px;border-radius:16px}.save-card .btn{align-self:stretch;justify-content:center}}
 </style>
 </head>
 <body>
@@ -417,7 +435,7 @@ footer{margin-top:var(--stack);border-top:1px solid var(--blush-line);padding-bl
     <div class="plate rise ticket">
       <span class="kicker">The ticket <span class="star">&#10022;</span></span>
       <div class="t-price">$50</div>
-      <div class="t-cap">25 spots only</div>
+      <div class="t-cap" id="spotsCap">25 spots only</div>
       <ul class="t-list">
         <li>A 1 to 1.5 hour crochet class with an instructor</li>
         <li>Your yarn and crochet hook</li>
@@ -431,10 +449,41 @@ footer{margin-top:var(--stack);border-top:1px solid var(--blush-line);padding-bl
       <p><b>Saturday, October 24, 2 to 4 PM</b><br>South Florida Sewing Studio, 2629 N Federal Hwy, Fort Lauderdale, FL</p>
       <p>October is a crochet class. An instructor teaches you to crochet your own bookmark, then we talk about Carmilla (the edition edited by Carmen Maria Machado).</p>
       <p>Tickets are $50 and there are 25 spots. That covers a real class with an instructor who works with you one on one, plus your yarn, your crochet hook, and printed instructions. If you don't finish your bookmark in class, you take the hook and instructions home and finish it there.</p>
-      <p>Tickets go up soon. Follow us on Instagram so you don't miss them.</p>
+      <p><b id="spotsLeftLine">25 spots.</b> Save yours below, then Zelle the $50 to lock it in.</p>
       <div class="mast-cta" style="justify-content:flex-start;margin-top:1.6em">
-        <a class="btn solid" href="https://www.instagram.com/thewellredclub" target="_blank" rel="noopener">Follow for tickets</a>
+        <a class="btn solid" href="#save">Save your spot</a>
         <a class="btn" href="pick.html">See the pick</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="save" id="save">
+    <div class="save-card">
+      <div class="save-form" id="saveForm">
+        <span class="kicker">October 24 <span class="star">&#10022;</span></span>
+        <h2>Save your <i>spot</i></h2>
+        <p class="save-sub">Fill this out to hold your seat for 48 hours. You'll get the Zelle details right after.</p>
+        <form id="spotForm" novalidate>
+          <label>Full name<input name="name" autocomplete="name" required placeholder="First and last"></label>
+          <label>Email<input name="email" type="email" autocomplete="email" required placeholder="you@email.com"></label>
+          <label>Phone<input name="phone" type="tel" autocomplete="tel" required placeholder="(954) 555-0123"></label>
+          <p class="save-err" id="spotErr" role="alert"></p>
+          <button class="btn solid" type="submit" id="spotBtn">Save my spot</button>
+          <p class="save-left" id="spotLeft"></p>
+        </form>
+      </div>
+      <div class="save-done" id="saveDone" hidden>
+        <span class="kicker">You're on the list <span class="star">&#10022;</span></span>
+        <h2>Your spot is <i>held</i></h2>
+        <p class="save-step"><b>Zelle $50 to Megan Smith at <span style="white-space:nowrap">954-806-3579</span></b> within 48 hours to lock it in. Put your full name in the memo so we can match it to you.</p>
+        <p>Once it comes through, Meg will text you to confirm you're in. If we don't get it within 48 hours, the spot goes to the next person.</p>
+        <p class="save-policy"><b>About refunds.</b> We know things come up. We pay the studio for every seat, so tickets aren't refundable, but you can give your spot to a friend. Just text us their name. If something serious happens, reach out and we'll work it out.</p>
+        <p>Questions? Text Meg at <a href="sms:+19548063579">954-806-3579</a>.</p>
+      </div>
+      <div class="save-done" id="saveFull" hidden>
+        <span class="kicker">Sold out <span class="star">&#10022;</span></span>
+        <h2>All 25 spots are <i>taken</i></h2>
+        <p>Spots open back up when a hold expires, so check back. Follow <a href="https://www.instagram.com/thewellredclub" target="_blank" rel="noopener">@thewellredclub</a> for the next one.</p>
       </div>
     </div>
   </div>
@@ -575,5 +624,40 @@ footer{margin-top:var(--stack);border-top:1px solid var(--blush-line);padding-bl
 </script>
 
 
+<script>
+(function(){
+  var API='/api/spots', LS='wellred-oct24-spot';
+  var form=document.getElementById('spotForm'), err=document.getElementById('spotErr'), btn=document.getElementById('spotBtn');
+  function show(id){ ['saveForm','saveDone','saveFull'].forEach(function(x){ document.getElementById(x).hidden = (x!==id); }); }
+  function setLeft(n){
+    var t = n===0 ? 'Sold out' : n===1 ? '1 spot left' : n+' spots left';
+    document.getElementById('spotLeft').textContent = n>0 ? t : '';
+    document.getElementById('spotsCap').textContent = t;
+    document.getElementById('spotsLeftLine').textContent = n>0 ? t+'.' : 'Sold out.';
+  }
+  try { if (localStorage.getItem(LS)) show('saveDone'); } catch(e){}
+  fetch(API,{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    if (typeof j.left==='number'){ setLeft(j.left); var held=false; try{held=!!localStorage.getItem(LS);}catch(e){} if (j.left===0 && !held) show('saveFull'); }
+  }).catch(function(){});
+  form.addEventListener('submit',function(e){
+    e.preventDefault(); err.textContent='';
+    var d={action:'hold',name:form.elements['name'].value.trim(),email:form.elements['email'].value.trim(),phone:form.elements['phone'].value.trim()};
+    if (d.name.split(/\s+/).length<2){ err.textContent='Add your full name, first and last.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)){ err.textContent='That email doesn\'t look right.'; return; }
+    if (d.phone.replace(/\D/g,'').length<10){ err.textContent='Add a phone number we can text.'; return; }
+    btn.disabled=true; btn.textContent='Saving…';
+    fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)}).then(function(r){return r.json().then(function(j){return {s:r.status,j:j};});}).then(function(o){
+      btn.disabled=false; btn.textContent='Save my spot';
+      if (o.s===409){ setLeft(0); show('saveFull'); return; }
+      if (!o.j.ok){ err.textContent = o.j.error==='closed' ? 'Sign-ups for this one are closed.' : 'Something went wrong. Try again or text Meg at 954-806-3579.'; return; }
+      try{ localStorage.setItem(LS,o.j.id); }catch(e){}
+      if (typeof o.j.left==='number') setLeft(o.j.left);
+      show('saveDone');
+      if (window.fbq) try{ fbq('track','Lead',{content_name:'Oct 24 crochet class'}); }catch(e){}
+      document.getElementById('save').scrollIntoView({behavior:'smooth',block:'start'});
+    }).catch(function(){ btn.disabled=false; btn.textContent='Save my spot'; err.textContent='Something went wrong. Try again or text Meg at 954-806-3579.'; });
+  });
+})();
+</script>
 </body>
 </html>
