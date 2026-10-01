@@ -64,6 +64,11 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 @media (max-width:560px){
   .tiles{grid-template-columns:repeat(2,1fr)}
 }
+.blast{background:var(--paper-2);border:1px solid var(--blush-line);border-radius:16px;padding:16px;margin:18px 0 6px}
+.blast h2{font-family:Lora,serif;font-size:1.2rem;margin-bottom:4px}
+.blist{list-style:none;margin-top:10px;max-height:260px;overflow:auto;font-size:.95rem;color:var(--ink-soft)}
+.blist li{padding:4px 0;border-bottom:1px dashed var(--blush-line)}
+.blist li.sent{color:var(--ok)}
 </style>
 </head>
 <body>
@@ -71,13 +76,13 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
   <header>
     <div class="brand">Well<b>Red</b> · hosts only</div>
     <h1>October 24 crochet class</h1>
-    <p class="meta">South Florida Sewing Studio · 25 spots · $50 by Zelle · holds last 48 hours</p>
+    <p class="meta">South Florida Sewing Studio · 23 spots · $50 by Zelle · holds last 48 hours</p>
   </header>
 
   <div class="tiles">
     <div class="tile"><b id="tPaid">0</b><span>Paid</span></div>
     <div class="tile"><b id="tHeld">0</b><span>Unpaid</span></div>
-    <div class="tile"><b id="tLeft">25</b><span>Spots left</span></div>
+    <div class="tile"><b id="tLeft">23</b><span>Spots left</span></div>
     <div class="tile"><b id="tMoney">$0</b><span>Collected</span></div>
   </div>
 
@@ -87,6 +92,18 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
     <span class="note" id="updated"></span>
   </div>
   <p class="note">When a Zelle comes in, check Paid. They'll get a "you're in" email automatically.</p>
+
+  <section class="blast" id="blast">
+    <h2>Early-access email</h2>
+    <p class="note" id="bInfo">Loading the list…</p>
+    <div class="bar">
+      <button class="btn ghost" id="bTest" type="button">Send us test emails</button>
+      <button class="btn solid" id="bSend" type="button" disabled>Send to everyone</button>
+      <button class="btn ghost" id="bShow" type="button">See who's on it</button>
+    </div>
+    <p class="note" id="bStatus"></p>
+    <ul class="blist" id="bList" hidden></ul>
+  </section>
 
   <div class="filters" id="filters">
     <button data-f="all" class="on">Everyone</button>
@@ -103,7 +120,7 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 var KEY = ''; try { KEY = localStorage.getItem('wr-host-key') || ''; } catch(e){}
 var API = '/api/spots';
 var HOLD = 48 * 3600 * 1000;
-var data = { spots: [], cap: 25, left: 25 };
+var data = { spots: [], cap: 23, left: 23 };
 var filter = 'all';
 var busy = false;
 
@@ -164,6 +181,7 @@ function render(){
       acts += '<a class="btn ghost" href="' + smsLink(s) + '">Text them too</a>';
     } else if (st === 'held'){
       acts += '<button class="btn ghost" data-act="release" data-id="' + s.id + '">Release spot</button>';
+      acts += '<button class="btn ghost" data-act="remove" data-id="' + s.id + '">Remove (test or duplicate)</button>';
     } else {
       acts += '<button class="btn ghost" data-act="restore" data-id="' + s.id + '">Give 48 more hours</button>';
       acts += '<button class="btn ghost" data-act="remove" data-id="' + s.id + '">Remove</button>';
@@ -243,6 +261,43 @@ document.getElementById('csv').addEventListener('click', function(){
 });
 load();
 setInterval(function(){ if (!busy && !document.hidden) load(); }, 20000);
+
+(function(){
+  var info=document.getElementById('bInfo'), st=document.getElementById('bStatus'), list=document.getElementById('bList');
+  var sendBtn=document.getElementById('bSend'), armed=false, last=null;
+  function post(action){ return fetch('/api/blast',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:KEY,action:action})}).then(function(r){return r.json();}); }
+  function refresh(){
+    if(!KEY) return;
+    post('list').then(function(j){
+      if(!j || j.error){ info.textContent = j && j.error==='nope' ? 'Enter the passcode above first.' : 'Couldn\'t load the list.'; return; }
+      last=j;
+      info.textContent = j.total + ' people on the list · ' + j.sent + ' sent · ' + j.remaining + ' not sent yet. Everyone who left an email on the August/September and October forms, duplicates removed.';
+      sendBtn.disabled = j.remaining===0;
+      sendBtn.textContent = j.remaining ? 'Send to ' + j.remaining + ' people' : 'All sent';
+      list.innerHTML = j.recipients.map(function(r){ return '<li class="'+(r.sent?'sent':'')+'">'+esc(r.name||'(no name)')+' · '+esc(r.email)+(r.sent?' · sent':'')+'</li>'; }).join('');
+    });
+  }
+  document.getElementById('bShow').addEventListener('click',function(){ list.hidden=!list.hidden; });
+  document.getElementById('bTest').addEventListener('click',function(){
+    st.textContent='Sending test…';
+    post('test').then(function(j){ st.textContent = j.ok ? 'Sent you and Kaitlyn all three emails, marked [TEST]. Check your inboxes.' : 'Test didn\'t send: ' + ((j.results||[]).map(function(r){return r.error||(r.skipped?'email not set up yet':'');}).join(', ') || j.error); });
+  });
+  sendBtn.addEventListener('click',function(){
+    if(!armed){ armed=true; sendBtn.textContent='Tap again to send for real'; setTimeout(function(){ armed=false; refresh(); },5000); return; }
+    armed=false; sendBtn.disabled=true;
+    (function loop(total){
+      st.textContent='Sending… ' + total + ' sent so far';
+      post('send').then(function(j){
+        if(!j.ok){ st.textContent='Stopped: ' + (j.error||'error'); refresh(); return; }
+        var errs=(j.results||[]).filter(function(r){return !r.ok;});
+        total+=j.sentNow;
+        if(errs.length && j.sentNow===0){ st.textContent='Stopped after ' + total + ': ' + errs[0].error; refresh(); return; }
+        if(j.remaining>0) loop(total); else { st.textContent='Done. Sent to ' + total + ' people.'; refresh(); }
+      }).catch(function(){ st.textContent='Connection dropped after ' + total + '. Tap send again to pick up where it left off.'; refresh(); });
+    })(0);
+  });
+  refresh();
+})();
 </script>
 </body>
 </html>
