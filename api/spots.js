@@ -1,11 +1,12 @@
 // Save-your-spot list for the Oct 24 crochet meetup at South Florida Sewing Studio.
 // POST /api/spots {action:'hold', name, email, phone}          -> {ok, id, left}
 // GET  /api/spots                                              -> {left, cap, closed}
-// GET  /api/spots?key=SECRET                                   -> {spots, cap, left}
+// GET  /api/spots?key=PASSCODE                                   -> {spots, cap, left}
 // POST /api/spots {action:'paid'|'release'|'restore'|'remove', key, id, paid?}
 // A hold lasts 48 hours. Paid spots never expire. Storage: the site's Upstash Redis.
 const KEY = 'wellred:event:2026-10-24:spots';
-const SECRET = 'needle-velvet-1024';
+// Host passcode lives in the Vercel env var SPOTS_KEY, never in this public repo.
+const SECRET = process.env.SPOTS_KEY || '';
 const CAP = 25;
 const HOLD_MS = 48 * 60 * 60 * 1000;
 const CLOSES = Date.parse('2026-10-24T14:00:00-04:00');
@@ -47,7 +48,7 @@ export default async function handler(req, res) {
     const spots = await load();
     const taken = spots.filter((s) => isActive(s, now)).length;
     const left = Math.max(0, CAP - taken);
-    if ((req.query.key || '') === SECRET) {
+    if (SECRET && (req.query.key || '') === SECRET) {
       return res.status(200).json({ spots, cap: CAP, left, holdHours: 48 });
     }
     return res.status(200).json({ left, cap: CAP, closed: now >= CLOSES });
@@ -83,7 +84,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true, id: s.id, t: s.t, left: Math.max(0, CAP - taken - 1) });
   }
 
-  if (body.key !== SECRET) return res.status(403).json({ error: 'nope' });
+  if (!SECRET || body.key !== SECRET) return res.status(403).json({ error: 'nope' });
   const spots = await load();
   const s = spots.find((x) => x.id === body.id);
   if (!s) return res.status(404).json({ error: 'not found' });
