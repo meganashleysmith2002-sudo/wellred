@@ -56,7 +56,8 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 .s-exp,.s-rel{background:#EEE6E3;color:var(--ink-soft)}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--blush-line)}
 .actions .btn{font-size:.66rem;padding:.55em 1em;min-height:36px}
-.confirmed{font-size:.9rem;color:var(--ok);align-self:center}
+.confirmed{font-size:.95rem;color:var(--ok);align-self:center;width:100%}
+.mailerr{font-size:.95rem;color:var(--claret);align-self:center;width:100%}
 .empty{text-align:center;color:var(--ink-soft);padding:40px 0}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:.7em 1.2em;border-radius:999px;font-size:.95rem;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.on{opacity:1}
@@ -85,7 +86,7 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
     <button class="btn ghost" id="csv" type="button">Download list</button>
     <span class="note" id="updated"></span>
   </div>
-  <p class="note">When a Zelle comes in, check Paid. A text to that person opens on your phone, already written. Just hit send.</p>
+  <p class="note">When a Zelle comes in, check Paid. They'll get a "you're in" email automatically.</p>
 
   <div class="filters" id="filters">
     <button data-f="all" class="on">Everyone</button>
@@ -158,9 +159,9 @@ function render(){
       : '<span class="status s-rel">Released</span>';
     var acts = '';
     if (st === 'paid'){
-      acts += '<a class="btn solid" href="' + smsLink(s) + '" data-confirm="' + s.id + '">Text confirmation</a>';
-      acts += '<a class="btn" href="' + mailLink(s) + '" data-confirm="' + s.id + '">Email confirmation</a>';
-      if (s.confirmedAt) acts += '<span class="confirmed">Confirmation opened ' + esc(when(s.confirmedAt)) + '</span>';
+      if (s.paidEmailAt) acts += '<span class="confirmed">&#10003; "You\'re in" email sent ' + esc(when(s.paidEmailAt)) + '</span>';
+      else acts += '<span class="mailerr">Confirmation email didn\'t send' + (s.paidEmailError ? ' (' + esc(s.paidEmailError) + ')' : '') + '</span><button class="btn solid" data-act="resend" data-id="' + s.id + '">Resend email</button>';
+      acts += '<a class="btn ghost" href="' + smsLink(s) + '">Text them too</a>';
     } else if (st === 'held'){
       acts += '<button class="btn ghost" data-act="release" data-id="' + s.id + '">Release spot</button>';
     } else {
@@ -210,8 +211,7 @@ document.getElementById('list').addEventListener('change', function(e){
     busy = false;
     if (paid){
       var s = data.spots.find(function(x){ return x.id === id; });
-      toast('Marked paid. Opening a text to ' + first(s && s.name) + '…');
-      if (s){ act('confirmed', id); setTimeout(function(){ window.location.href = smsLink(s); }, 500); }
+      toast(s && s.paidEmailAt ? 'Paid. Confirmation emailed to ' + first(s.name) + '.' : 'Marked paid, but the email didn\'t send.');
     } else {
       toast('Unmarked.');
     }
@@ -223,7 +223,8 @@ document.getElementById('list').addEventListener('click', function(e){
   var b = e.target.closest('[data-act]');
   if (!b) return;
   b.disabled = true;
-  act(b.getAttribute('data-act'), b.getAttribute('data-id')).then(function(){ toast('Saved.'); });
+  var which = b.getAttribute('data-act');
+  act(which, b.getAttribute('data-id')).then(function(j){ toast(which === 'resend' ? (j && j.spot && j.spot.paidEmailAt ? 'Email sent.' : 'Still didn\'t send.') : 'Saved.'); });
 });
 document.getElementById('filters').addEventListener('click', function(e){
   var b = e.target.closest('button'); if (!b) return;
