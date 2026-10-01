@@ -9,7 +9,7 @@ import { send, heldEmail, paidEmail, hostEmail } from './_mail.js';
 const KEY = 'wellred:event:2026-10-24:spots';
 // Host passcode lives in the Vercel env var HOST_KEY, never in this public repo.
 const SECRET = process.env.HOST_KEY || '';
-const CAP = 25;
+const CAP = 23;
 const HOLD_MS = 48 * 60 * 60 * 1000;
 const CLOSES = Date.parse('2026-10-24T14:00:00-04:00');
 
@@ -101,7 +101,7 @@ export default async function handler(req, res) {
     if (s.paid && !s.paidEmailAt) {
       const r = await send(paidEmail(s));
       if (r.ok) s.paidEmailAt = new Date().toISOString();
-      else s.paidEmailError = r.skipped ? 'email not set up' : r.error;
+      else s.paidEmailError = r.off ? 'emails switched off for now' : r.skipped ? 'email not set up' : r.error;
     }
   } else if (body.action === 'release') {
     s.released = true; s.paid = false;
@@ -110,7 +110,7 @@ export default async function handler(req, res) {
   } else if (body.action === 'resend') {
     const r = await send(paidEmail(s));
     if (r.ok) { s.paidEmailAt = new Date().toISOString(); s.paidEmailError = null; }
-    else s.paidEmailError = r.skipped ? 'email not set up' : r.error;
+    else s.paidEmailError = r.off ? 'emails switched off for now' : r.skipped ? 'email not set up' : r.error;
   } else if (body.action === 'confirmed') {
     s.confirmedAt = new Date(now).toISOString();
   } else if (body.action === 'remove') {
