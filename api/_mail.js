@@ -69,6 +69,7 @@ function heldHtml(s) {
   const p = P;
   return shell(`<p style="${p}">Hi ${esc(first(s.name))},</p>
 <p style="${p}"><b>Hell yes!</b> You just signed up for our October meetup, and we like you even better now.</p>
+<p style="text-align:center;margin:0 0 18px"><img src="cid:wellred-dance" width="220" height="164" alt="A pumpkin-headed dancer celebrating" style="display:inline-block;border-radius:12px;max-width:100%;height:auto"></p>
 <p style="${p};background:#F3DCD7;border-radius:12px;padding:14px 16px">Your spot is held for 48 hours. To lock it in, <b>Zelle $50 to Megan Smith at 954-806-3579</b> and put your full name in the memo so we can mark you down.</p>
 <p style="${p}">Once we get it, you'll get an additional confirmation email.</p>
 ${VENUE_HTML(p)}
@@ -92,11 +93,13 @@ function asset(name, fallbackUrl) {
   catch (e) { return { path: fallbackUrl }; }
 }
 const CAT = [{ filename: 'wellred.gif', ...asset('thanks-cat-email.gif', 'https://www.wellred.club/thanks-cat-email.gif'), cid: 'wellred-cat', contentType: 'image/gif', contentDisposition: 'inline' }];
+const DANCE = [{ filename: 'woohoo.gif', ...asset('pumpkin-dance.gif', 'https://www.wellred.club/pumpkin-dance.gif'), cid: 'wellred-dance', contentType: 'image/gif', contentDisposition: 'inline' }];
 const PUMPKIN = [{ filename: 'happy-october.gif', ...asset('october-pumpkin-email.gif', 'https://www.wellred.club/october-pumpkin-email.gif'), cid: 'wellred-pumpkin', contentType: 'image/gif', contentDisposition: 'inline' }];
 
 export function heldEmail(s) {
   return {
     html: heldHtml(s),
+    attachments: DANCE,
     to: s.email,
     subject: "Hell yes, you're signed up for the WellRed crochet class",
     text:
