@@ -283,7 +283,7 @@ setInterval(function(){ if (!busy && !document.hidden) load(); }, 20000);
   document.getElementById('bTest').addEventListener('click',function(){
     var to=document.getElementById('bTo').value.trim();
     st.textContent='Sending test…';
-    post('test',{to:to}).then(function(j){ st.textContent = j.ok ? 'Sent all three emails, marked [TEST], to ' + (to || 'you and Kaitlyn') + '.' : 'Test didn\'t send: ' + ((j.results||[]).map(function(r){return r.error||(r.skipped?'email not set up yet':'');}).filter(Boolean)[0] || j.error); });
+    post('test',{to:to}).then(function(j){ st.textContent = j.ok ? 'Sent the early-access email, marked [TEST], to ' + (to || 'you and Kaitlyn') + '.' : 'Test didn\'t send: ' + ((j.results||[]).map(function(r){return r.error||(r.skipped?'email not set up yet':'');}).filter(Boolean)[0] || j.error); });
   });
   sendBtn.addEventListener('click',function(){
     if(!armed){ armed=true; sendBtn.textContent='Tap again to send for real'; setTimeout(function(){ armed=false; refresh(); },5000); return; }
