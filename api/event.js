@@ -4,7 +4,8 @@
 const VALID = ['house', 'plow', 'gothic', 'fruitfly'];
 const KEY_VOTES = 'wellred:event:2026-08-29:votes';
 const KEY_FEED = 'wellred:event:2026-08-29:feedback';
-const SECRET = 'cellar-vellum-606';
+// Host passcode lives in the Vercel env var HOST_KEY, never in this public repo.
+const SECRET = process.env.HOST_KEY || '';
 const FIELDS = ['name','city','email','age','found','loved','improve','lookfor','spot','books','ticket','price','activity'];
 
 export default async function handler(req, res) {
@@ -19,7 +20,7 @@ export default async function handler(req, res) {
   }).then((r) => r.json());
 
   if (req.method === 'GET') {
-    if ((req.query.key || '') !== SECRET) return res.status(403).json({ error: 'nope' });
+    if (!SECRET || (req.query.key || '') !== SECRET) return res.status(403).json({ error: 'nope' });
     const v = await call(['HGETALL', KEY_VOTES]);
     const f = await call(['LRANGE', KEY_FEED, '0', '-1']);
     const flat = v.result || [];
@@ -62,7 +63,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
-  if (body.action === 'reset' && body.key === SECRET) {
+  if (body.action === 'reset' && SECRET && body.key === SECRET) {
     await call(['DEL', KEY_VOTES]);
     await call(['DEL', KEY_FEED]);
     return res.status(200).json({ ok: true });
