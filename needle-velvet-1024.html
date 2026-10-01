@@ -210,7 +210,7 @@ function load(){
   if (!KEY && !askKey()) { document.getElementById('list').innerHTML = '<p class="empty">Enter the host passcode to see the list. <button class="btn ghost" onclick="askKey()&&load()">Enter passcode</button></p>'; return Promise.resolve(); }
   return fetch(API + '?key=' + encodeURIComponent(KEY) + '&_=' + Date.now(), { cache: 'no-store' }).then(function(r){ return r.json(); }).then(function(j){
     if (j && j.error === 'nope'){ KEY = ''; try { localStorage.removeItem('wr-host-key'); } catch(e){} document.getElementById('list').innerHTML = '<p class="empty">That passcode didn\'t work. <button class="btn ghost" onclick="askKey()&&load()">Try again</button></p>'; return; }
-    if (j && j.spots){ data = j; render(); document.getElementById('updated').textContent = 'Updated ' + new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+    if (j && j.spots){ data = j; render(); if (window.blastRefresh && !window._blastLoaded) { window._blastLoaded = true; window.blastRefresh(); } document.getElementById('updated').textContent = 'Updated ' + new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
   }).catch(function(){ toast("Couldn't load the list. Check your connection."); });
 }
 function act(action, id, extra){
@@ -299,6 +299,7 @@ setInterval(function(){ if (!busy && !document.hidden) load(); }, 20000);
       }).catch(function(){ st.textContent='Connection dropped after ' + total + '. Tap send again to pick up where it left off.'; refresh(); });
     })(0);
   });
+  window.blastRefresh = refresh;
   refresh();
 })();
 </script>
