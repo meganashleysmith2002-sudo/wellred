@@ -4,6 +4,8 @@
 // GET  /api/spots?key=PASSCODE                                   -> {spots, cap, left}
 // POST /api/spots {action:'paid'|'release'|'restore'|'remove', key, id, paid?}
 // A hold lasts 48 hours. Paid spots never expire. Storage: the site's Upstash Redis.
+import { send, heldEmail, paidEmail, hostEmail } from './_mail.js';
+
 const KEY = 'wellred:event:2026-10-24:spots';
 // Host passcode lives in the Vercel env var HOST_KEY, never in this public repo.
 const SECRET = process.env.HOST_KEY || '';
@@ -80,8 +82,11 @@ export default async function handler(req, res) {
       t: new Date(now).toISOString(),
       paid: false,
     };
+    const left = Math.max(0, CAP - taken - 1);
+    const [a] = await Promise.all([send(heldEmail(s)), send(hostEmail(s, left, CAP))]);
+    if (a && a.ok) s.heldEmailAt = new Date().toISOString();
     await save(s);
-    return res.status(200).json({ ok: true, id: s.id, t: s.t, left: Math.max(0, CAP - taken - 1) });
+    return res.status(200).json({ ok: true, id: s.id, t: s.t, left });
   }
 
   if (!SECRET || body.key !== SECRET) return res.status(403).json({ error: 'nope' });
@@ -93,10 +98,19 @@ export default async function handler(req, res) {
     s.paid = !!body.paid;
     s.paidAt = s.paid ? new Date(now).toISOString() : null;
     if (s.paid) s.released = false;
+    if (s.paid && !s.paidEmailAt) {
+      const r = await send(paidEmail(s));
+      if (r.ok) s.paidEmailAt = new Date().toISOString();
+      else s.paidEmailError = r.skipped ? 'email not set up' : r.error;
+    }
   } else if (body.action === 'release') {
     s.released = true; s.paid = false;
   } else if (body.action === 'restore') {
     s.released = false; s.t = new Date(now).toISOString();
+  } else if (body.action === 'resend') {
+    const r = await send(paidEmail(s));
+    if (r.ok) { s.paidEmailAt = new Date().toISOString(); s.paidEmailError = null; }
+    else s.paidEmailError = r.skipped ? 'email not set up' : r.error;
   } else if (body.action === 'confirmed') {
     s.confirmedAt = new Date(now).toISOString();
   } else if (body.action === 'remove') {
