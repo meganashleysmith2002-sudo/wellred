@@ -49,6 +49,7 @@ const first = (n) => String(n || '').trim().split(/\s+/)[0] || 'there';
 const MAPS = 'https://www.google.com/maps/search/?api=1&query=South+Florida+Sewing+Studio+2629+N+Federal+Hwy+Fort+Lauderdale+FL';
 const STUDIO = 'https://www.southfloridasewingstudio.com/';
 const EVENT = 'Saturday, October 24, 2 to 4 PM\nSouth Florida Sewing Studio, 2629 N Federal Hwy, Fort Lauderdale\nMap: ' + MAPS + '\nThe studio: ' + STUDIO;
+const FLYER_HTML = `<p style="text-align:center;margin:0 0 18px"><img src="cid:wellred-flyer" width="400" height="500" alt="WellRed October meetup flyer" style="display:inline-block;width:100%;max-width:400px;height:auto;border-radius:8px"></p>`;
 const VENUE_HTML = (p) => `<p style="${p}"><b>Saturday, October 24, 2 to 4 PM</b><br><a href="${STUDIO}" style="color:#8C1C1C">South Florida Sewing Studio</a>, 2629 N Federal Hwy, Fort Lauderdale<br><a href="${MAPS}" style="color:#8C1C1C">Open in Google Maps</a></p>`;
 
 const esc = (v) => String(v == null ? '' : v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
@@ -94,6 +95,7 @@ function asset(name, fallbackUrl) {
 }
 const CAT = [{ filename: 'wellred.gif', ...asset('thanks-cat-email.gif', 'https://www.wellred.club/thanks-cat-email.gif'), cid: 'wellred-cat', contentType: 'image/gif', contentDisposition: 'inline' }];
 const DANCE = [{ filename: 'woohoo.gif', ...asset('pumpkin-dance.gif', 'https://www.wellred.club/pumpkin-dance.gif'), cid: 'wellred-dance', contentType: 'image/gif', contentDisposition: 'inline' }];
+const FLYER = { filename: 'wellred-october-flyer.jpg', ...asset('october-flyer-email.jpg', 'https://www.wellred.club/october-flyer.jpg'), cid: 'wellred-flyer', contentType: 'image/jpeg', contentDisposition: 'inline' };
 const PUMPKIN = [{ filename: 'happy-october.gif', ...asset('october-pumpkin-email.gif', 'https://www.wellred.club/october-pumpkin-email.gif'), cid: 'wellred-pumpkin', contentType: 'image/gif', contentDisposition: 'inline' }];
 
 export function heldEmail(s) {
@@ -183,6 +185,7 @@ function earlyHtml(name, unsub) {
 <p style="${p}"><b>Happy October!!</b> Since you gave us your email on one of our forms, you get exclusive first access to our October meetup before we post it anywhere else.</p>
 <p style="text-align:center;margin:0 0 18px"><img src="cid:wellred-pumpkin" width="300" height="249" alt="Happy October" style="display:inline-block;border-radius:12px;max-width:100%;height:auto"></p>
 <p style="${p}">We're doing a crochet class at South Florida Sewing Studio. An instructor will teach everyone to crochet their own bookmark, then we'll talk about Carmilla (the edition edited by Carmen Maria Machado).</p>
+${FLYER_HTML}
 ${VENUE_HTML(p)}
 <p style="${p}">Tickets are $50 and there are only 23 spots. That covers a full 1 to 1.5 hour class with an instructor, your yarn and crochet hook, and printed instructions to take home if you don't finish in class.</p>
 <p style="margin:0 0 8px;font-size:16px;font-weight:bold;color:#241412">How to save your spot</p>
@@ -207,7 +210,7 @@ export function earlyEmail(to, name, token) {
     headers: { 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
     subject: 'Happy October! You get first access to our next meetup',
     html: earlyHtml(name, unsub),
-    attachments: PUMPKIN,
+    attachments: [...PUMPKIN, FLYER],
     text:
 `${name ? 'Hi ' + first(name) + ',' : 'Hi there,'}
 
