@@ -77,13 +77,13 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
   <header>
     <div class="brand">Well<b>Red</b> · hosts only</div>
     <h1>October 24 crochet class</h1>
-    <p class="meta">South Florida Sewing Studio · 23 spots · $50 by Zelle · holds last 48 hours</p>
+    <p class="meta">South Florida Sewing Studio · 25 spots · $50 by Zelle · holds last 48 hours</p>
   </header>
 
   <div class="tiles">
     <div class="tile"><b id="tPaid">0</b><span>Paid</span></div>
     <div class="tile"><b id="tHeld">0</b><span>Unpaid</span></div>
-    <div class="tile"><b id="tLeft">23</b><span>Spots left</span></div>
+    <div class="tile"><b id="tLeft">25</b><span>Spots left</span></div>
     <div class="tile"><b id="tMoney">$0</b><span>Collected</span></div>
   </div>
 
@@ -122,7 +122,7 @@ h1{font-family:Lora,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.2rem);lin
 var KEY = ''; try { KEY = localStorage.getItem('wr-host-key') || ''; } catch(e){}
 var API = '/api/spots';
 var HOLD = 48 * 3600 * 1000;
-var data = { spots: [], cap: 23, left: 23 };
+var data = { spots: [], cap: 25, left: 25 };
 var filter = 'all';
 var busy = false;
 
@@ -277,10 +277,10 @@ setInterval(function(){ if (!busy && !document.hidden) load(); }, 20000);
     post('list').then(function(j){
       if(!j || j.error){ info.textContent = j && j.error==='nope' ? 'Enter the passcode above first.' : 'Couldn\'t load the list.'; return; }
       last=j;
-      info.textContent = j.total + ' people on the list · ' + j.sent + ' sent · ' + j.remaining + ' not sent yet' + (j.unsubscribed ? ' · ' + j.unsubscribed + ' unsubscribed' : '') + '. Everyone who left an email on the August/September and October forms, duplicates removed. Anyone who unsubscribes is skipped automatically.';
+      info.textContent = j.total + ' people on the list · ' + j.sent + ' sent · ' + j.remaining + ' not sent yet' + (j.unsubscribed ? ' · ' + j.unsubscribed + ' taken off the list' : '') + '. Everyone who left an email on the August/September and October forms, duplicates removed. Anyone who unsubscribes is skipped automatically.';
       sendBtn.disabled = j.remaining===0;
       sendBtn.textContent = j.remaining ? 'Send to ' + j.remaining + ' people' : 'All sent';
-      list.innerHTML = j.recipients.map(function(r){ return '<li class="'+(r.unsubscribed?'unsub':r.sent?'sent':'')+'">'+esc(r.name||'(no name)')+' · '+esc(r.email)+(r.unsubscribed?' · unsubscribed':r.sent?' · sent':'')+'</li>'; }).join('');
+      list.innerHTML = j.recipients.map(function(r){ return '<li class="'+(r.unsubscribed?'unsub':r.sent?'sent':'')+'">'+esc(r.name||'(no name)')+' · '+esc(r.email)+(r.unsubscribed?' · taken off the list':r.sent?' · sent':'')+'</li>'; }).join('');
     });
   }
   document.getElementById('bShow').addEventListener('click',function(){ list.hidden=!list.hidden; });
