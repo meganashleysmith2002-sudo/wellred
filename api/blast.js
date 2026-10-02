@@ -52,6 +52,14 @@ export default async function handler(req, res) {
     return res.status(200).json({ total: recipients.length, sent: sentSet.size, unsubscribed: recipients.filter((x) => x.unsubscribed).length, remaining: remaining.length, recipients });
   }
 
+  if (body.action === 'exclude') {
+    // Take someone off the send list (same as them unsubscribing). Form answers stay untouched.
+    const email = String(body.email || '').trim().toLowerCase();
+    if (!byEmail.has(email)) return res.status(404).json({ error: 'not on list' });
+    await call(['SADD', UNSUB, email]);
+    return res.status(200).json({ ok: true, excluded: email });
+  }
+
   if (body.action === 'test') {
     const extra = String(body.to || '').trim().toLowerCase();
     const to = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(extra) ? [extra]
