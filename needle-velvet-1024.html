@@ -161,7 +161,7 @@ function render(){
   var held = spots.filter(function(s){ return state(s) === 'held'; });
   document.getElementById('tPaid').textContent = paid.length;
   document.getElementById('tHeld').textContent = held.length;
-  document.getElementById('tLeft').textContent = Math.max(0, data.cap - paid.length - held.length);
+  document.getElementById('tLeft').textContent = Math.max(0, data.cap - (data.reserved||0) - paid.length - held.length);
   document.getElementById('tMoney').textContent = '$' + (paid.length * 50);
 
   var shown = spots.filter(function(s){
