@@ -192,7 +192,7 @@ function earlyHtml(name, unsub) {
 <p style="${p}">We're doing a crochet class at South Florida Sewing Studio. An instructor will teach everyone to crochet their own bookmark, then we'll talk about Carmilla (the edition edited by Carmen Maria Machado).</p>
 ${FLYER_HTML}
 ${VENUE_HTML(p)}
-<p style="${p}">Tickets are $50 and there are only 23 spots. That covers a full 1 to 1.5 hour class with an instructor, your yarn and crochet hook, and printed instructions to take home if you don't finish in class.</p>
+<p style="${p}">Tickets are $50 and there are only 25 spots. That covers a full 1 to 1.5 hour class with an instructor, your yarn and crochet hook, and printed instructions to take home if you don't finish in class.</p>
 <p style="margin:0 0 8px;font-size:16px;font-weight:bold;color:#241412">How to save your spot</p>
 <ol style="margin:0 0 20px;padding-left:22px;font-size:16px;line-height:1.5;color:#241412">
 <li style="margin-bottom:6px">Click the button below and fill out the short form.</li>
@@ -225,7 +225,7 @@ We're doing a crochet class at South Florida Sewing Studio. An instructor will t
 
 ${EVENT}
 
-Tickets are $50 and there are only 23 spots. That covers a full 1 to 1.5 hour class with an instructor, your yarn and crochet hook, and printed instructions to take home if you don't finish in class.
+Tickets are $50 and there are only 25 spots. That covers a full 1 to 1.5 hour class with an instructor, your yarn and crochet hook, and printed instructions to take home if you don't finish in class.
 
 How to save your spot:
 1. Go to ${RESERVE} and fill out the short form.

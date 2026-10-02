@@ -26,7 +26,7 @@ async function pushAlert(title, message) {
 const KEY = 'wellred:event:2026-10-24:spots';
 // Host passcode lives in the Vercel env var HOST_KEY, never in this public repo.
 const SECRET = process.env.HOST_KEY || '';
-const CAP = 23;
+const CAP = 25;
 const HOLD_MS = 48 * 60 * 60 * 1000;
 const CLOSES = Date.parse('2026-10-24T14:00:00-04:00');
 
