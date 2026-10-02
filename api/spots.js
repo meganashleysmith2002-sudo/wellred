@@ -27,6 +27,8 @@ const KEY = 'wellred:event:2026-10-24:spots';
 // Host passcode lives in the Vercel env var HOST_KEY, never in this public repo.
 const SECRET = process.env.HOST_KEY || '';
 const CAP = 25;
+// Meg and Kaitlyn's own seats, counted as taken.
+const RESERVED = 2;
 const HOLD_MS = 48 * 60 * 60 * 1000;
 const CLOSES = Date.parse('2026-10-24T14:00:00-04:00');
 
@@ -65,14 +67,14 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     const spots = await load();
-    const taken = spots.filter((s) => isActive(s, now)).length;
+    const taken = spots.filter((s) => isActive(s, now)).length + RESERVED;
     const left = Math.max(0, CAP - taken);
     if (req.query.check) {
       const mine = spots.find((x) => x.id === String(req.query.check));
       return res.status(200).json({ active: !!(mine && isActive(mine, now)), paid: !!(mine && mine.paid), left, cap: CAP });
     }
     if (SECRET && (req.query.key || '') === SECRET) {
-      return res.status(200).json({ spots, cap: CAP, left, holdHours: 48 });
+      return res.status(200).json({ spots, cap: CAP, left, reserved: RESERVED, holdHours: 48 });
     }
     return res.status(200).json({ left, cap: CAP, closed: now >= CLOSES });
   }
@@ -93,7 +95,7 @@ export default async function handler(req, res) {
 
     const spots = await load();
     const mine = spots.find((s) => s.email === email && isActive(s, now));
-    const taken = spots.filter((s) => isActive(s, now)).length;
+    const taken = spots.filter((s) => isActive(s, now)).length + RESERVED;
     if (mine) return res.status(200).json({ ok: true, id: mine.id, t: mine.t, again: true, left: Math.max(0, CAP - taken) });
     if (taken >= CAP) return res.status(409).json({ error: 'full', left: 0 });
 
