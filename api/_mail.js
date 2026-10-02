@@ -44,7 +44,12 @@ export async function send({ to, subject, text, html, replyTo, attachments, list
   }
 }
 
-const first = (n) => String(n || '').trim().split(/\s+/)[0] || 'there';
+// First name for greetings: capitalized, or "there" if the name doesn't look like a real first name.
+const first = (n) => {
+  const w = String(n || '').trim().split(/\s+/)[0] || '';
+  if (w.length < 2 || /[^A-Za-z\u00C0-\u024F'\-]/.test(w)) return 'there';
+  return w.charAt(0).toUpperCase() + w.slice(1);
+};
 
 const MAPS = 'https://www.google.com/maps/search/?api=1&query=South+Florida+Sewing+Studio+2629+N+Federal+Hwy+Fort+Lauderdale+FL';
 const STUDIO = 'https://www.southfloridasewingstudio.com/';
@@ -175,7 +180,7 @@ const RESERVE = 'https://wellred.club/meetups#save';
 
 function earlyHtml(name, unsub) {
   const p = 'margin:0 0 16px;font-size:16px;line-height:1.5;color:#241412';
-  const hi = name ? `Hi ${esc(first(name))},` : 'Hi there,';
+  const hi = `Hi ${esc(first(name))},`;
   return `<!doctype html><html><body style="margin:0;padding:0;background:#F6EFE3">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6EFE3"><tr><td align="center" style="padding:24px 12px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#FDFAF4;border:1px solid #D39D96;border-radius:16px">
@@ -212,7 +217,7 @@ export function earlyEmail(to, name, token) {
     html: earlyHtml(name, unsub),
     attachments: [...PUMPKIN, FLYER],
     text:
-`${name ? 'Hi ' + first(name) + ',' : 'Hi there,'}
+`Hi ${first(name)},
 
 Happy October!! Since you gave us your email on one of our forms, you get exclusive first access to our October meetup before we post it anywhere else.
 
