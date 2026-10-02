@@ -6,6 +6,23 @@
 // A hold lasts 48 hours. Paid spots never expire. Storage: the site's Upstash Redis.
 import { send, heldEmail, paidEmail, hostEmail } from './_mail.js';
 
+// Phone push alert through the free ntfy app. The private channel name lives in
+// the Vercel env var NTFY_TOPIC (never in this public code). No topic set = no push.
+async function pushAlert(title, message) {
+  const topic = (process.env.NTFY_TOPIC || '').trim();
+  if (!topic) return;
+  try {
+    await Promise.race([
+      fetch('https://ntfy.sh/' + encodeURIComponent(topic), {
+        method: 'POST',
+        headers: { Title: title, Tags: 'books', Click: 'https://wellred.club/needle-velvet-1024', Priority: 'high' },
+        body: message,
+      }),
+      new Promise((r) => setTimeout(r, 4000)),
+    ]);
+  } catch (e) {}
+}
+
 const KEY = 'wellred:event:2026-10-24:spots';
 // Host passcode lives in the Vercel env var HOST_KEY, never in this public repo.
 const SECRET = process.env.HOST_KEY || '';
@@ -87,7 +104,11 @@ export default async function handler(req, res) {
       paid: false,
     };
     const left = Math.max(0, CAP - taken - 1);
-    const [a] = await Promise.all([send(heldEmail(s)), send(hostEmail(s, left, CAP))]);
+    const [a] = await Promise.all([
+      send(heldEmail(s)),
+      send(hostEmail(s, left, CAP)),
+      pushAlert('New WellRed sign-up', s.name + ' saved a spot. ' + left + ' of ' + CAP + ' left. Waiting on Zelle.'),
+    ]);
     if (a && a.ok) s.heldEmailAt = new Date().toISOString();
     await save(s);
     return res.status(200).json({ ok: true, id: s.id, t: s.t, left });
