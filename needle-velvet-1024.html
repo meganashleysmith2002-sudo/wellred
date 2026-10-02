@@ -127,7 +127,7 @@ var filter = 'all';
 var busy = false;
 
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-function first(n){ return String(n || '').trim().split(/\s+/)[0] || 'there'; }
+function first(n){ var w = String(n || '').trim().split(/\s+/)[0] || ''; if (w.length < 2 || /[^A-Za-z\u00C0-\u024F'\-]/.test(w)) return 'there'; return w.charAt(0).toUpperCase() + w.slice(1); }
 function digits(p){ var d = String(p || '').replace(/\D/g, ''); if (d.length === 10) d = '1' + d; return d; }
 function state(s){
   if (s.removed) return 'removed';
@@ -140,10 +140,13 @@ function when(t){ try { return new Date(t).toLocaleString([], {month:'short', da
 function toast(m){ var t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(function(){ t.classList.remove('on'); }, 2400); }
 
 function confirmText(s){
-  return 'Hi ' + first(s.name) + ', it\'s Meg from WellRed! Got your Zelle, you\'re officially in for the crochet class on Saturday, Oct 24, 2 to 4 PM at South Florida Sewing Studio, 2629 N Federal Hwy, Fort Lauderdale. Yarn, hook and instructions are covered, just bring Carmilla (the Carmen Maria Machado edition). See you there!';
+  return 'Hi ' + first(s.name) + ', it\'s Meg from WellRed! We got your payment and you are officially IN for the crochet class on Saturday, Oct 24, 2 to 4 PM at South Florida Sewing Studio, 2629 N Federal Hwy, Fort Lauderdale. Yarn, hook and instructions are covered, just bring Carmilla (the Carmen Maria Machado edition). See you there!';
 }
-function smsLink(s){
-  var body = encodeURIComponent(confirmText(s));
+function heldText(s){
+  return 'Hi ' + first(s.name) + ', it\'s Meg from WellRed! Hell yes, your spot for the Oct 24 crochet class is held for 48 hours. To lock it in, Zelle $50 to Megan Smith at 954-806-3579 and put your full name in the memo. Once it comes through you\'ll get a confirmation. Any problems, just text me here!';
+}
+function smsLink(s, text){
+  var body = encodeURIComponent(text || confirmText(s));
   var d = digits(s.phone);
   var ios = /iPhone|iPad|Macintosh/.test(navigator.userAgent);
   return 'sms:+' + d + (ios ? '&' : '?') + 'body=' + body;
@@ -180,8 +183,9 @@ function render(){
     if (st === 'paid'){
       if (s.paidEmailAt) acts += '<span class="confirmed">&#10003; "You\'re in" email sent ' + esc(when(s.paidEmailAt)) + '</span>';
       else acts += '<span class="mailerr">Confirmation email didn\'t send' + (s.paidEmailError ? ' (' + esc(s.paidEmailError) + ')' : '') + '</span><button class="btn solid" data-act="resend" data-id="' + s.id + '">Resend email</button>';
-      acts += '<a class="btn ghost" href="' + smsLink(s) + '">Text them too</a>';
+      acts += '<a class="btn ghost" href="' + smsLink(s) + '">Text them</a>';
     } else if (st === 'held'){
+      acts += '<a class="btn solid" href="' + smsLink(s, heldText(s)) + '">Text them</a>';
       acts += '<button class="btn ghost" data-act="release" data-id="' + s.id + '">Release spot</button>';
       acts += '<button class="btn ghost" data-act="remove" data-id="' + s.id + '">Remove (test or duplicate)</button>';
     } else {
