@@ -89,6 +89,7 @@ export default async function handler(req, res) {
     const name = String(body.name || '').trim().slice(0, 120);
     const email = String(body.email || '').trim().toLowerCase().slice(0, 160);
     const phone = String(body.phone || '').trim().slice(0, 40);
+    const src = String(body.src || '').replace(/[^\w\-\/.]/g, '').slice(0, 60);
     if (name.length < 3 || name.indexOf(' ') === -1) return res.status(400).json({ error: 'name' });
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'email' });
     if (phone.replace(/\D/g, '').length < 10) return res.status(400).json({ error: 'phone' });
@@ -101,7 +102,7 @@ export default async function handler(req, res) {
 
     const s = {
       id: 's' + now.toString(36) + Math.random().toString(36).slice(2, 6),
-      name, email, phone,
+      name, email, phone, src,
       t: new Date(now).toISOString(),
       paid: false,
     };
