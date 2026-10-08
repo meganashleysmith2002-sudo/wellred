@@ -197,7 +197,7 @@ function render(){
         '<label class="check"><input type="checkbox" data-paid="' + s.id + '"' + (s.paid ? ' checked' : '') + '><small>Paid</small></label>' +
         '<div class="who"><div class="name">' + esc(s.name) + '</div>' + badge +
           '<div class="contact"><a href="tel:+' + digits(s.phone) + '">' + esc(s.phone) + '</a> · <a href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a></div>' +
-          '<div class="contact">Signed up ' + esc(when(s.t)) + (s.paidAt ? ' · paid ' + esc(when(s.paidAt)) : '') + '</div></div>' +
+          '<div class="contact">Signed up ' + esc(when(s.t)) + (s.src ? ' · from ' + esc(/^(ig|instagram)/i.test(s.src) ? 'Instagram ad' : s.src) : '') + (s.paidAt ? ' · paid ' + esc(when(s.paidAt)) : '') + '</div></div>' +
       '</div>' +
       '<div class="actions">' + acts + '</div>' +
     '</div>';

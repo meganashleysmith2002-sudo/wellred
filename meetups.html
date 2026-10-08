@@ -634,6 +634,7 @@ footer{margin-top:var(--stack);border-top:1px solid var(--blush-line);padding-bl
     document.getElementById('spotsCap').textContent = t;
     document.getElementById('spotsLeftLine').textContent = n>0 ? t+'.' : 'Sold out.';
   }
+  var src=''; try { var q=new URLSearchParams(location.search); src=(q.get('utm_source')||q.get('src')||'')+(q.get('utm_campaign')?'/'+q.get('utm_campaign'):''); if(src) localStorage.setItem('wr-src',src); else src=localStorage.getItem('wr-src')||''; } catch(e){}
   var savedId=null; try { savedId=localStorage.getItem(LS); } catch(e){}
   fetch(API+(savedId?'?check='+encodeURIComponent(savedId):''),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
     if (typeof j.left==='number') setLeft(j.left);
@@ -647,7 +648,7 @@ footer{margin-top:var(--stack);border-top:1px solid var(--blush-line);padding-bl
   });
   form.addEventListener('submit',function(e){
     e.preventDefault(); err.textContent='';
-    var d={action:'hold',name:form.elements['name'].value.trim(),email:form.elements['email'].value.trim(),phone:form.elements['phone'].value.trim()};
+    var d={action:'hold',name:form.elements['name'].value.trim(),email:form.elements['email'].value.trim(),phone:form.elements['phone'].value.trim(),src:src};
     if (d.name.split(/\s+/).length<2){ err.textContent='Add your full name, first and last.'; return; }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)){ err.textContent='That email doesn\'t look right.'; return; }
     if (d.phone.replace(/\D/g,'').length<10){ err.textContent='Add a phone number we can text.'; return; }
@@ -659,7 +660,7 @@ footer{margin-top:var(--stack);border-top:1px solid var(--blush-line);padding-bl
       try{ localStorage.setItem(LS,o.j.id); }catch(e){}
       if (typeof o.j.left==='number') setLeft(o.j.left);
       show('saveDone');
-      if (window.fbq) try{ fbq('track','Lead',{content_name:'Oct 24 crochet class'}); }catch(e){}
+      if (window.fbq) try{ fbq('track','Lead',{content_name:'Oct 24 crochet class',value:50,currency:'USD'}); }catch(e){}
       document.getElementById('save').scrollIntoView({behavior:'smooth',block:'start'});
     }).catch(function(){ btn.disabled=false; btn.textContent='Save my spot'; err.textContent='Something went wrong. Try again or text Meg at 954-806-3579.'; });
   });
