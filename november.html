@@ -448,7 +448,7 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     h += stdBlock();
     h += '<div class="gotit-acts"><button class="gotit-btn" data-back>Back to the ballot</button>'
       + '<button class="linky" data-goform>Tell us what you think</button></div>';
-    h += '<p class="gotit-note">Change your mind? Tap another cover on the ballot. Voting is open through November 30.</p>';
+    h += '<p class="gotit-note">Change your mind? Tap another cover on the ballot. Voting closes Halloween at midnight.</p>';
     h += '</div>';
     app.innerHTML = h;
     var back = app.querySelector("[data-back]");
@@ -506,7 +506,7 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       g.querySelectorAll(".chip").forEach(function(c){ c.setAttribute("aria-pressed", c.getAttribute("data-val")===want ? "true":"false"); });
     });
   }
-  var CLOSES = new Date("2026-12-01T00:00:00-05:00");
+  var CLOSES = new Date("2026-11-01T00:00:00-04:00");
   function closed(){ return Date.now() >= CLOSES.getTime(); }
   function render(){
     if (justSent) { renderThanks(); return; }
@@ -522,12 +522,12 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     h += '<div class="kick">the november ballot</div>';
     if (closed()) {
       h += "<h1>Voting is <i>closed</i></h1>";
-      h += '<p class="sub">The November vote closed on November 30. Follow <a href="https://www.instagram.com/thewellredclub/" target="_blank" rel="noopener noreferrer">@thewellredclub</a> for the winner.</p></div></header>';
+      h += '<p class="sub">The November vote closed on Halloween. Follow <a href="https://www.instagram.com/thewellredclub/" target="_blank" rel="noopener noreferrer">@thewellredclub</a> for the winner.</p></div></header>';
     } else {
       h += voted ? "<h1>Your <i>pick</i> is in</h1>" : "<h1>Pick the <i>November</i> read</h1>";
       h += '<p class="sub">' + (voted
-        ? "Tap another cover if you change your mind. Voting stays open through November 30."
-        : "Four contenders. Flip any one to see what it&rsquo;s about, then vote. Voting is open through November 30.") + "</p></div></header>";
+        ? "Tap another cover if you change your mind. Voting closes Halloween at midnight."
+        : "Four contenders. Flip any one to see what it&rsquo;s about, then vote. Voting closes Halloween at midnight.") + "</p></div></header>";
     }
 
     h += '<main class="wrap"><div class="ballot">';

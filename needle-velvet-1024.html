@@ -145,6 +145,9 @@ function confirmText(s){
 function heldText(s){
   return 'Hi ' + first(s.name) + ', it\'s Meg from WellRed! Hell yes, your spot for the Oct 24 crochet class is held for 48 hours. To lock it in, Zelle $50 to Megan Smith at 954-806-3579 and put your full name in the memo. Once it comes through you\'ll get a confirmation. Any problems, just text me here!';
 }
+function dayofText(s){
+  return 'Hi ' + first(s.name) + ', it\'s Meg from WellRed! So excited to see you today! Just a reminder, we\'re at South Florida Sewing Studio, 2629 N Federal Hwy, Fort Lauderdale, from 2 to 4 PM. Here\'s how you vote for next month\'s read: wellred.club/november. We have four options and we\'re excited to see what you choose. The poll ends Halloween at midnight!';
+}
 function smsLink(s, text){
   var body = encodeURIComponent(text || confirmText(s));
   var d = digits(s.phone);
@@ -183,6 +186,7 @@ function render(){
     if (st === 'paid'){
       if (s.paidEmailAt) acts += '<span class="confirmed">&#10003; "You\'re in" email sent ' + esc(when(s.paidEmailAt)) + '</span>';
       else acts += '<span class="mailerr">Confirmation email didn\'t send' + (s.paidEmailError ? ' (' + esc(s.paidEmailError) + ')' : '') + '</span><button class="btn solid" data-act="resend" data-id="' + s.id + '">Resend email</button>';
+      acts += '<a class="btn solid" href="' + smsLink(s, dayofText(s)) + '">Day-of text</a>';
       acts += '<a class="btn ghost" href="' + smsLink(s) + '">Text them</a>';
     } else if (st === 'held'){
       acts += '<a class="btn solid" href="' + smsLink(s, heldText(s)) + '">Text them</a>';
