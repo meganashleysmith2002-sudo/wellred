@@ -357,6 +357,33 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
   font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--on-night-soft);
   font-weight:800;display:flex;justify-content:space-between;gap:12px}
 
+
+/* ---------- feedback form, card style ---------- */
+#fbsec{counter-reset:q}
+#fbsec .sec-head h2{font-size:1.6rem}
+#fbsec .fb-kick{font-family:'Caveat',cursive;font-size:1.6rem;color:var(--red);display:inline-block;transform:rotate(-3deg);margin-bottom:2px}
+#fbsec .field{position:relative;margin-top:16px;background:var(--cream-2);border:3px solid var(--ink);
+  border-radius:4px 16px 16px 4px;padding:16px 16px 18px 24px;box-shadow:5px 6px 0 rgba(42,23,18,.14);overflow:hidden}
+#fbsec .field::before{content:"";position:absolute;left:0;top:0;bottom:0;width:9px;background:var(--red);border-right:3px solid var(--ink)}
+#fbsec .field.q > .label::before{counter-increment:q;content:counter(q,decimal-leading-zero);display:block;
+  font-family:'Archivo Black',sans-serif;color:var(--red);font-size:.78rem;letter-spacing:.06em;margin-bottom:4px}
+#fbsec .label{font-size:.95rem;line-height:1.15;margin-bottom:12px}
+#fbsec .hint{margin-top:5px;font-size:.84rem}
+#fbsec textarea,#fbsec input[type="text"],#fbsec input[type="email"]{background:var(--cream);border:2px solid var(--ink);border-radius:10px}
+#fbsec textarea:focus,#fbsec input:focus{border-color:var(--red);outline:none;box-shadow:0 0 0 3px rgba(140,28,28,.18)}
+#fbsec .chip{background:var(--cream);border-width:2px;padding:9px 15px;box-shadow:0 3px 0 rgba(42,23,18,.14);transition:background .14s,color .14s,transform .12s}
+#fbsec .chip:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(42,23,18,.14)}
+#fbsec .chip[aria-pressed="true"]{background:var(--red);border-color:var(--ink);color:var(--cream)}
+#fbsec .sec-note{margin-bottom:4px}
+#fbsec .free{background:var(--ink);color:var(--cream)}
+#fbsec .free::before{background:var(--gold-lit)}
+#fbsec .free .label,#fbsec .free .hint{color:var(--cream)}
+#fbsec .free .chip{background:transparent;color:var(--cream);border-color:var(--cream);box-shadow:none}
+#fbsec .free .chip[aria-pressed="true"]{background:var(--gold-lit);color:var(--ink);border-color:var(--gold-lit)}
+#fbsec .free-k{font-family:'Caveat',cursive;font-size:1.45rem;color:var(--gold-lit);display:inline-block;transform:rotate(-2deg)}
+#fbsec .free-t{font-family:'Archivo Black',sans-serif;text-transform:uppercase;letter-spacing:-.02em;line-height:.95;font-size:1.45rem;margin:4px 0 6px}
+#fbsec .free p{color:rgba(246,239,226,.82);font-size:.9rem;margin-bottom:14px}
+#fbsec .cta{margin-top:30px}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
   .card-in{transition:none}
@@ -581,27 +608,27 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       + '<button class="linky" data-again>Add more notes</button></div></section>';
   }
   function field(name,label,hint){
-    return '<div class="field"><div class="label">'+label+'<div class="hint">'+hint+'</div></div>'
+    return '<div class="field q"><div class="label">'+label+'<div class="hint">'+hint+'</div></div>'
       + '<textarea data-f="'+name+'" rows="2"></textarea></div>';
   }
   function chips(key,label,hint,opts){
-    var h='<div class="field"><div class="label">'+label+(hint?'<div class="hint">'+hint+'</div>':"")+'</div><div class="chips" data-pick="'+key+'">';
+    var h='<div class="field q"><div class="label">'+label+(hint?'<div class="hint">'+hint+'</div>':"")+'</div><div class="chips" data-pick="'+key+'">';
     opts.forEach(function(s){h+='<button type="button" class="chip" data-val="'+esc(s)+'" aria-pressed="false">'+esc(s)+'</button>';});
     return h+"</div></div>";
   }
   function formBlock(){
     var h='';
-    h+='<section class="sec" id="fbsec" style="margin-top:26px"><div class="sec-head"><h2>Tell us the rest</h2><span class="sec-line"></span></div>';
+    h+='<section class="sec" id="fbsec" style="margin-top:34px"><div class="fb-kick">after class</div><div class="sec-head"><h2>Tell us the rest</h2><span class="sec-line"></span></div>';
     h+='<p class="sec-note">All optional. Skip anything you don&rsquo;t feel like answering.</p>';
     h+=chips("found","How did you hear about us?","",SOURCES);
     h+=field("classfb","How was the crochet class?","Be honest, we&rsquo;re planning the next one");
     h+=chips("nextact","What activity should we do next?","Pick the one you&rsquo;d sign up for first",NEXTACT);
     h+=field("activity","Anything else you&rsquo;d want to try?","Name it, we&rsquo;ll look into it");
     h+=chips("daytime","What day and time works best?","",DAYTIME);
-    h+='<div class="sec-head" style="margin-top:38px"><h2>Free meetups coming up</h2><span class="sec-line"></span></div>';
-    h+='<p class="sec-note">Our next two meetups are going to be free. Here&rsquo;s what we&rsquo;re thinking.</p>';
-    h+=chips("freeevent","Which would you come to?","",FREEEV);
-    h+='<div class="sec-head" style="margin-top:38px"><h2>Everything else</h2><span class="sec-line"></span></div>';
+    h+='<div class="field free"><div class="free-k">coming up</div><div class="free-t">The next two meetups are free</div>'
+      + '<p>Here&rsquo;s what we&rsquo;re thinking. Which would you come to?</p><div class="chips" data-pick="freeevent">';
+    FREEEV.forEach(function(s){h+='<button type="button" class="chip" data-val="'+esc(s)+'" aria-pressed="false">'+esc(s)+'</button>';});
+    h+='</div></div>';
     h+=field("improve","What would you change?","Be honest, it&rsquo;s how this gets better");
     h+=field("spot","Where should we meet next?","A bar, a shop, a patio, name names");
     h+=field("books","Books we should be reading","Anything you&rsquo;ve been pushing on people");
@@ -612,7 +639,7 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       + '<div><div class="label">City</div><input type="text" data-f="city" autocomplete="address-level2" placeholder="Fort Lauderdale, Plantation&hellip;"></div></div></div>';
     h+='<div class="field"><div class="label">Email<div class="hint">Only if you want the newsletter and first crack at tickets</div></div>'
       + '<input type="email" data-f="email" autocomplete="email" inputmode="email" placeholder="you@email.com"></div>';
-    h+=chips("age","Age range","",AGES);
+    h+=chips("age","Age range","",AGES).replace('class="field q"','class="field"');
     h+='<button class="cta" data-send>Send it</button>';
     h+='<p class="note">Goes to Meg and Kaitlyn. Nothing here is required, including your name.</p></section>';
     return h;
