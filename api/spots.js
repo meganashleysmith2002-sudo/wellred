@@ -3,6 +3,7 @@
 // GET  /api/spots                                              -> {left, cap, closed}
 // GET  /api/spots?key=PASSCODE                                   -> {spots, cap, left}
 // POST /api/spots {action:'paid'|'release'|'restore'|'remove', key, id, paid?}
+// POST /api/spots {action:'edit', key, id, name?, note?}  host fixes a name or adds a note
 // A hold lasts 48 hours. Paid spots never expire. Storage: the site's Upstash Redis.
 import { send, heldEmail, paidEmail, hostEmail } from './_mail.js';
 
@@ -141,6 +142,12 @@ export default async function handler(req, res) {
     else s.paidEmailError = r.off ? 'emails switched off for now' : r.skipped ? 'email not set up' : r.error;
   } else if (body.action === 'confirmed') {
     s.confirmedAt = new Date(now).toISOString();
+  } else if (body.action === 'edit') {
+    if (typeof body.name === 'string' && body.name.trim()) {
+      if (!s.origName && s.name !== body.name.trim()) s.origName = s.name;
+      s.name = body.name.trim().slice(0, 120);
+    }
+    if (typeof body.note === 'string') s.note = body.note.trim().slice(0, 300);
   } else if (body.action === 'remove') {
     s.removed = true; s.paid = false;
   } else {
