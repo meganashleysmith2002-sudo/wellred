@@ -6,7 +6,7 @@ const KEY_VOTES = 'wellred:event:2026-11:votes';
 const KEY_FEED = 'wellred:event:2026-11:feedback';
 // Host passcode lives in the Vercel env var HOST_KEY, never in this public repo.
 const SECRET = process.env.HOST_KEY || '';
-const FIELDS = ['name','city','email','vote','age','found','loved','improve','lookfor','spot','books','ticket','price','activity'];
+const FIELDS = ['name','city','email','vote','age','found','classfb','nextact','daytime','freeevent','loved','improve','lookfor','spot','books','ticket','price','activity'];
 
 export default async function handler(req, res) {
   const url = process.env.KV_REST_API_URL;
