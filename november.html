@@ -509,6 +509,8 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
   }
   var CLOSES = new Date("2026-11-01T00:00:00-04:00");
   function closed(){ return Date.now() >= CLOSES.getTime(); }
+  var FBLINK = /^#feedback/.test(location.hash||"");
+  var fbScrolled = false;
   function render(){
     if (justSent) { renderThanks(); return; }
     if (justVoted) { renderGotIt(); return; }
@@ -562,13 +564,14 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
         + "<p>One more thing while you&rsquo;re here. A few quick questions, all optional.</p>"
         + '<button class="nudge-btn" data-goform>Tell us what you think</button></div>';
     }
-    if (voted && !closed()) h += read(FB_KEY) ? doneBlock() : formBlock();
+    if ((voted || FBLINK) && !closed()) h += read(FB_KEY) ? doneBlock() : formBlock();
     h += "</main>";
     h += '<footer class="wrap"><span>Well Red Club</span><span>Fort Lauderdale, FL</span></footer>';
     app.innerHTML = h;
     restore();
     wire();
     fitWordmark();
+    if (FBLINK && !fbScrolled) { fbScrolled = true; var fs = app.querySelector("#fbsec") || app.querySelector(".done"); if (fs) setTimeout(function(){ fs.scrollIntoView({block:"start"}); }, 60); }
   }
 
   function doneBlock(){
