@@ -146,7 +146,7 @@ function heldText(s){
   return 'Hi ' + first(s.name) + ', it\'s Meg from WellRed! Hell yes, your spot for the Oct 24 crochet class is held for 48 hours. To lock it in, Zelle $50 to Megan Smith at 954-806-3579 and put your full name in the memo. Once it comes through you\'ll get a confirmation. Any problems, just text me here!';
 }
 function dayofText(s){
-  return 'Hi ' + first(s.name) + ', it\'s Meg from WellRed! So excited to see you today! Just a reminder, we\'re at South Florida Sewing Studio, 2629 N Federal Hwy, Fort Lauderdale, from 2 to 4 PM. Here\'s how you vote for next month\'s read: wellred.club/november. We have four options and we\'re excited to see what you choose. The poll ends Halloween at midnight!';
+  return 'Hi ' + first(s.name) + ' it\'s Meg from WellRed again, so excited to see you today! Just a reminder, we\'re at South Florida Sewing Studio, 2629 N Federal Hwy, Fort Lauderdale, from 2 to 4 PM.\n\nHere\'s how you vote for next month\'s read: wellred.club/november\n\nWe have four options and we\'re excited to see what you choose. The poll ends Halloween at midnight!';
 }
 function smsLink(s, text){
   var body = encodeURIComponent(text || confirmText(s));
