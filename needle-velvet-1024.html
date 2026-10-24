@@ -192,10 +192,13 @@ function render(){
       acts += '<button class="btn ghost" data-act="restore" data-id="' + s.id + '">Give 48 more hours</button>';
       acts += '<button class="btn ghost" data-act="remove" data-id="' + s.id + '">Remove</button>';
     }
+    acts += '<button class="btn ghost" data-edit="' + s.id + '">Edit name / note</button>';
     return '<div class="row ' + (st === 'paid' ? 'paid' : st === 'held' ? 'held' : 'gone') + '">' +
       '<div class="top">' +
         '<label class="check"><input type="checkbox" data-paid="' + s.id + '"' + (s.paid ? ' checked' : '') + '><small>Paid</small></label>' +
         '<div class="who"><div class="name">' + esc(s.name) + '</div>' + badge +
+          (s.note ? '<div class="contact"><b>Note:</b> ' + esc(s.note) + '</div>' : '') +
+          (s.origName ? '<div class="contact">Signed up as ' + esc(s.origName) + '</div>' : '') +
           '<div class="contact"><a href="tel:+' + digits(s.phone) + '">' + esc(s.phone) + '</a> · <a href="mailto:' + esc(s.email) + '">' + esc(s.email) + '</a></div>' +
           '<div class="contact">Signed up ' + esc(when(s.t)) + (s.src ? ' · from ' + esc(/^(ig|instagram)/i.test(s.src) ? 'Instagram ad' : s.src) : '') + (s.paidAt ? ' · paid ' + esc(when(s.paidAt)) : '') + '</div></div>' +
       '</div>' +
@@ -242,6 +245,17 @@ document.getElementById('list').addEventListener('change', function(e){
   }).catch(function(){ busy = false; toast("That didn't save. Try again."); e.target.checked = !paid; });
 });
 document.getElementById('list').addEventListener('click', function(e){
+  var ed = e.target.closest('[data-edit]');
+  if (ed){
+    var eid = ed.getAttribute('data-edit');
+    var cur = data.spots.find(function(x){ return x.id === eid; }) || {};
+    var nn = window.prompt('Name', cur.name || '');
+    if (nn === null) return;
+    var nt = window.prompt('Note (optional)', cur.note || '');
+    if (nt === null) return;
+    act('edit', eid, { name: nn, note: nt }).then(function(j){ toast(j && j.ok ? 'Saved.' : "That didn't save. Try again."); });
+    return;
+  }
   var c = e.target.closest('[data-confirm]');
   if (c){ act('confirmed', c.getAttribute('data-confirm')); return; }
   var b = e.target.closest('[data-act]');
@@ -258,8 +272,8 @@ document.getElementById('filters').addEventListener('click', function(e){
 });
 document.getElementById('refresh').addEventListener('click', load);
 document.getElementById('csv').addEventListener('click', function(){
-  var rows = [['Name','Email','Phone','Signed up','Status','Paid at']];
-  data.spots.filter(function(s){ return !s.removed; }).forEach(function(s){ rows.push([s.name, s.email, s.phone, s.t, state(s), s.paidAt || '']); });
+  var rows = [['Name','Email','Phone','Signed up','Status','Paid at','Note']];
+  data.spots.filter(function(s){ return !s.removed; }).forEach(function(s){ rows.push([s.name, s.email, s.phone, s.t, state(s), s.paidAt || '', s.note || '']); });
   var csv = rows.map(function(r){ return r.map(function(v){ return '"' + String(v).replace(/"/g, '""') + '"'; }).join(','); }).join('\n');
   var a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
