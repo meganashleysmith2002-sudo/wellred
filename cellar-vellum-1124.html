@@ -326,8 +326,9 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
   ];
   var SOURCES = ["Instagram", "TikTok", "A friend told me", "The venue", "Substack", "Eventbrite", "Just wandered in"];
   var AGES = ["Under 21", "21\u201324", "25\u201329", "30\u201334", "35\u201344", "45+"];
-  var TICKET = ["Yes, sign me up", "Maybe, depends on price", "Free events only"];
-  var PRICE = ["Under $15", "$15\u201325", "$25\u201340", "$40+"];
+  var NEXTACT = ["Pottery", "Candle making", "Painting", "Embroidery", "Something else"];
+  var FREEEV = ["A hot girl walk", "Donation-based yoga or pilates", "Both", "Neither"];
+  var DAYTIME = ["Saturday afternoon", "Saturday evening", "Sunday afternoon", "A weeknight"];
   var SECRET = ""; try { SECRET = localStorage.getItem("wr-host-key") || ""; } catch(e){}
   function askKey(){ var k = window.prompt("Host passcode"); if (!k) return false; SECRET = k.trim(); try { localStorage.setItem("wr-host-key", SECRET); } catch(e){} return true; }
   if (!SECRET) askKey();
@@ -359,17 +360,17 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     lastData=data;
     var c=data.counts||{}, fb=data.feedback||[], t=total(c);
     var emails=fb.filter(function(f){return f.email}).length;
-    var keen=fb.filter(function(f){return /yes/i.test(f.ticket||"")}).length;
+    var keen=fb.filter(function(f){return f.classfb}).length;
     var h='<header class="dash-mast"><div class="wrap">';
     h+='<div class="brand-sm">Well<b>Red</b></div>';
     h+='<div class="kick">the count</div>';
-    h+='<h1>How <i>tonight</i> is going</h1>';
+    h+='<h1>The <i>November</i> vote</h1>';
     h+='<p class="sub"><span class="dot"></span>Refreshes every few seconds. Just for you and Kaitlyn.</p>';
     h+="</div></header><main class=\"wrap\">";
 
     h+='<div class="tiles">';
     [[t,t===1?"vote":"votes"],[fb.length,fb.length===1?"response":"responses"],
-     [emails,"emails"],[keen,"keen on tickets"]].forEach(function(s){
+     [emails,"emails"],[keen,"class reviews"]].forEach(function(s){
       h+='<div class="tile"><div class="tile-n">'+s[0]+'</div><div class="tile-l">'+s[1]+"</div></div>";
     });
     h+="</div>";
@@ -394,8 +395,9 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       h+='<div class="bgrid">';
       h+='<div class="panel"><h3 class="panel-t">Found us via</h3>'+tallyRows(countBy(fb,"found"),fb.length)+"</div>";
       h+='<div class="panel"><h3 class="panel-t">Age range</h3>'+tallyRows(countBy(fb,"age",AGES),fb.length)+"</div>";
-      h+='<div class="panel"><h3 class="panel-t">Ticketed events</h3>'+tallyRows(countBy(fb,"ticket",TICKET),fb.length)+"</div>";
-      h+='<div class="panel"><h3 class="panel-t">Fair price</h3>'+tallyRows(countBy(fb,"price",PRICE),fb.length)+"</div>";
+      h+='<div class="panel"><h3 class="panel-t">Next activity</h3>'+tallyRows(countBy(fb,"nextact",NEXTACT),fb.length)+"</div>";
+      h+='<div class="panel"><h3 class="panel-t">Best day and time</h3>'+tallyRows(countBy(fb,"daytime",DAYTIME),fb.length)+"</div>";
+      h+='<div class="panel"><h3 class="panel-t">Free meetup pick</h3>'+tallyRows(countBy(fb,"freeevent",FREEEV),fb.length)+"</div>";
       h+="</div>";
     }
     h+="</section>";
@@ -407,7 +409,7 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       fb.slice().reverse().forEach(function(f){
         var who=[f.name,f.age,f.city].filter(Boolean).map(esc).join(" &middot; ");
         h+='<div class="voice"><div class="who">'+(who||"anonymous")+"</div>";
-        [["Voted for",f.vote],["Loved",f.loved],["Would change",f.improve],["Looks for",f.lookfor],
+        [["Voted for",f.vote],["Crochet class",f.classfb],["Next activity",f.nextact],["Best time",f.daytime],["Free meetup",f.freeevent],["Would change",f.improve],
          ["Venue idea",f.spot],["Book recs",f.books],["Activity ideas",f.activity],
          ["Email",f.email]].forEach(function(p){
           if(p[1])h+='<div class="v-item"><span class="v-l">'+p[0]+'</span><span class="v-v">'+esc(p[1])+"</span></div>";
@@ -440,9 +442,9 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       return rows;
     }
     var cols=[["t","Submitted (UTC)"],["name","Name"],["city","City"],["email","Email"],["vote","Voted for"],
-      ["age","Age range"],["found","Found us via"],["loved","Loved"],["improve","Would change"],
-      ["lookfor","Looks for in a club"],["spot","Venue idea"],["books","Book recs"],
-      ["ticket","Ticketed events"],["price","Fair price"],["activity","Activity ideas"]];
+      ["age","Age range"],["found","Found us via"],["classfb","Crochet class"],["nextact","Next activity"],
+      ["daytime","Best day and time"],["freeevent","Free meetup pick"],["improve","Would change"],["spot","Venue idea"],["books","Book recs"],
+      ["activity","Activity ideas"]];
     var rows=[cols.map(function(c){return c[1]})];
     (lastData.feedback||[]).forEach(function(f){
       rows.push(cols.map(function(c){return f[c[0]]||""}));

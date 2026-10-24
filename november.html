@@ -387,10 +387,11 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
       syn: "Sophie Pattison loves books. She works at a local book festival and has a husband she adores, a lifelong best friend and a brother she's close to. Except since Christmas she's been living alone, isn't speaking to her best friend, is avoiding her brother and is about to lose her job. Her one comfort is an author she loved in her twenties, and the daydream of meeting her someday. Then the chance actually comes. Dark, funny and about finding your way back to yourself.",
       fable: "https://fable.co/book/sophie-standing-there-by-meg-mason-9780063493155" , vibes: ["Literary fiction", "Dark humor", "Messy main character", "Complex relationships", "Loneliness"] }
   ];
-  var SOURCES = ["Instagram", "TikTok", "A friend told me", "The venue", "Substack", "Eventbrite", "Just wandered in"];
+  var SOURCES = ["Instagram", "TikTok", "A friend told me", "The venue", "Substack", "Fable", "Just wandered in"];
   var AGES = ["Under 21", "21\u201324", "25\u201329", "30\u201334", "35\u201344", "45+"];
-  var TICKET = ["Yes, sign me up", "Maybe, depends on price", "Free events only"];
-  var PRICE = ["Under $15", "$15\u201325", "$25\u201340", "$40+"];
+  var NEXTACT = ["Pottery", "Candle making", "Painting", "Embroidery", "Something else"];
+  var FREEEV = ["A hot girl walk", "Donation-based yoga or pilates", "Both", "Neither"];
+  var DAYTIME = ["Saturday afternoon", "Saturday evening", "Sunday afternoon", "A weeknight"];
   var VOTE_KEY = "wellred_nov_vote", FB_KEY = "wellred_nov_fb";
   var app = document.getElementById("app");
   var flipped = {};
@@ -589,17 +590,18 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     var h='';
     h+='<section class="sec" id="fbsec" style="margin-top:26px"><div class="sec-head"><h2>Tell us the rest</h2><span class="sec-line"></span></div>';
     h+='<p class="sec-note">All optional. Skip anything you don&rsquo;t feel like answering.</p>';
-    h+=chips("found","How did you find us?","",SOURCES);
-    h+=field("loved","What do you love about WellRed?","The part you&rsquo;d tell a friend about");
+    h+=chips("found","How did you hear about us?","",SOURCES);
+    h+=field("classfb","How was the crochet class?","Be honest, we&rsquo;re planning the next one");
+    h+=chips("nextact","What activity should we do next?","Pick the one you&rsquo;d sign up for first",NEXTACT);
+    h+=field("activity","Anything else you&rsquo;d want to try?","Name it, we&rsquo;ll look into it");
+    h+=chips("daytime","What day and time works best?","",DAYTIME);
+    h+='<div class="sec-head" style="margin-top:38px"><h2>Free meetups coming up</h2><span class="sec-line"></span></div>';
+    h+='<p class="sec-note">Our next two meetups are going to be free. Here&rsquo;s what we&rsquo;re thinking.</p>';
+    h+=chips("freeevent","Which would you come to?","",FREEEV);
+    h+='<div class="sec-head" style="margin-top:38px"><h2>Everything else</h2><span class="sec-line"></span></div>';
     h+=field("improve","What would you change?","Be honest, it&rsquo;s how this gets better");
-    h+=field("lookfor","What makes a book club worth showing up to?","For you, specifically");
     h+=field("spot","Where should we meet next?","A bar, a shop, a patio, name names");
     h+=field("books","Books we should be reading","Anything you&rsquo;ve been pushing on people");
-    h+='<div class="sec-head" style="margin-top:38px"><h2>Doing more than reading</h2><span class="sec-line"></span></div>';
-    h+='<p class="sec-note">We want meetups at local spots with an actual activity, like embroidery or crochet at a sewing studio, with book talk and drinks alongside. Those cost money to run, so they&rsquo;d be ticketed.</p>';
-    h+=chips("ticket","Would you come to a ticketed one?","",TICKET);
-    h+=chips("price","What feels fair for a ticket?","Book club, a drink and the activity included",PRICE);
-    h+=field("activity","Activities you&rsquo;d actually want","Embroidery, pottery, candles, wine tasting, tell us");
     h+='<div class="sec-head" style="margin-top:38px"><h2>A little about you</h2><span class="sec-line"></span></div>';
     h+='<p class="sec-note">Helps us plan meetups people can actually get to. Leave any of it blank.</p>';
     h+='<div class="field"><div class="row2">'
@@ -612,7 +614,6 @@ footer{margin-top:56px;padding-top:20px;border-top:3px solid var(--hair);
     h+='<p class="note">Goes to Meg and Kaitlyn. Nothing here is required, including your name.</p></section>';
     return h;
   }
-
   function wire(){
     app.querySelectorAll("[data-vote]").forEach(function(el){
       el.addEventListener("click",function(){castVote(el.getAttribute("data-vote"))});
